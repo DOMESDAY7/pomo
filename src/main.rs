@@ -6,6 +6,7 @@ use leptos::task::spawn_local;
 use notify::Permission;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
+use wasm_bindgen::JsCast;
 use webhook::{Delivery, Kind, Vars, Webhook};
 
 const STORAGE_KEY: &str = "pomo.settings";
@@ -349,8 +350,15 @@ fn App() -> impl IntoView {
         }
     });
 
+    // Show the countdown in the tab title while running; keep the SEO title
+    // from index.html otherwise so crawlers that render JS index the real one.
+    let base_title = document().title();
     Effect::new(move |_| {
-        let title = format!("{} – {}", format_time(timer.remaining_ms.get()), timer.mode.get().label());
+        let title = if timer.running.get() {
+            format!("{} – {}", format_time(timer.remaining_ms.get()), timer.mode.get().label())
+        } else {
+            base_title.clone()
+        };
         document().set_title(&title);
     });
 
@@ -369,7 +377,7 @@ fn App() -> impl IntoView {
     view! {
         <div class=move || format!("app {}", timer.mode.get().class())>
             <header>
-                <h1><img class="logo" src="icons/icon-192.png" alt="" />"Pomodoro"</h1>
+                <div class="brand"><img class="logo" src="icons/icon-192.png" alt="" />"Pomodoro"</div>
                 <button class="icon-btn" on:click=move |_| show_settings.update(|v| *v = !*v)>
                     "⚙ Réglages"
                 </button>
@@ -659,5 +667,10 @@ fn WebhookEditor(timer: Timer, id: u32) -> impl IntoView {
 
 fn main() {
     console_error_panic_hook::set_once();
-    mount_to_body(App);
+    let root = document()
+        .get_element_by_id("app")
+        .expect("#app missing from index.html");
+    // The static <noscript> fallback is only for non-JS visitors.
+    root.set_inner_html("");
+    leptos::mount::mount_to(root.unchecked_into(), App).forget();
 }
