@@ -3,6 +3,7 @@
 //! safelisted content types, no custom headers) whenever possible so the
 //! browser sends them without a preflight.
 
+use crate::i18n::tr;
 use serde::{Deserialize, Serialize};
 use wasm_bindgen::{JsCast, JsValue};
 use wasm_bindgen_futures::JsFuture;
@@ -39,7 +40,7 @@ impl Kind {
             Kind::Slack => "Slack / Mattermost",
             Kind::Ntfy => "ntfy",
             Kind::Gotify => "Gotify",
-            Kind::Custom => "Personnalisé",
+            Kind::Custom => tr().custom,
         }
     }
 
@@ -124,13 +125,13 @@ pub enum Delivery {
 fn js_err(e: JsValue) -> String {
     e.as_string()
         .or_else(|| js_sys::Reflect::get(&e, &"message".into()).ok().and_then(|m| m.as_string()))
-        .unwrap_or_else(|| "erreur inconnue".into())
+        .unwrap_or_else(|| tr().err_unknown.into())
 }
 
 pub async fn send(hook: &Webhook, title: &str, message: &str, vars: &Vars) -> Result<Delivery, String> {
     let mut url = hook.url.trim().to_string();
     if !url.starts_with("https://") && !url.starts_with("http://") {
-        return Err("l'URL doit commencer par https://".into());
+        return Err(tr().err_scheme.into());
     }
 
     let init = web_sys::RequestInit::new();
@@ -204,7 +205,7 @@ pub async fn send(hook: &Webhook, title: &str, message: &str, vars: &Vars) -> Re
         .map_err(|e| {
             let msg = js_err(e);
             if hook.kind == Kind::Custom && !no_cors {
-                format!("{msg} (le serveur doit autoriser le CORS)")
+                format!("{msg} ({})", tr().err_cors)
             } else {
                 msg
             }

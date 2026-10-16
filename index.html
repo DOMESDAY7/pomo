@@ -3,15 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- i18n:head -->
     <title>Minuteur Pomodoro gratuit en ligne – notifications Discord, Slack, ntfy</title>
     <meta
       name="description"
       content="Minuteur Pomodoro gratuit, sans pub et sans compte. Durées réglables, fonctionne hors ligne, notifications du navigateur et webhooks Discord, Slack, ntfy ou Gotify. Open source."
     />
     <link rel="canonical" href="https://pomo.domesday.fr/" />
-    <meta name="theme-color" content="#ba4949" />
-    <meta name="robots" content="index, follow" />
-
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:site_name" content="Pomodoro" />
@@ -32,10 +30,6 @@
       content="Gratuit, sans pub, hors ligne. Notifications du navigateur et webhooks Discord, Slack, ntfy."
     />
     <meta name="twitter:image" content="https://pomo.domesday.fr/og.png" />
-
-    <link rel="manifest" href="manifest.webmanifest" />
-    <link rel="icon" type="image/png" href="icons/favicon.png" />
-    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 
     <script type="application/ld+json">
       {
@@ -94,6 +88,15 @@
         ]
       }
     </script>
+    <!-- /i18n:head -->
+    <link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/" />
+    <link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/" />
+    <meta name="theme-color" content="#ba4949" />
+    <meta name="robots" content="index, follow" />
+    <link rel="manifest" href="manifest.webmanifest" />
+    <link rel="icon" type="image/png" href="icons/favicon.png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 
     <link data-trunk rel="css" href="style.css" />
     <link data-trunk rel="copy-file" href="manifest.webmanifest" />
@@ -101,6 +104,7 @@
     <link data-trunk rel="copy-file" href="robots.txt" />
     <link data-trunk rel="copy-file" href="sitemap.xml" />
     <link data-trunk rel="copy-file" href="og.png" />
+    <link data-trunk rel="copy-file" href="og-en.png" />
     <link data-trunk rel="copy-dir" href="icons" />
     <link data-trunk rel="rust" data-wasm-opt="z" />
     <script>
@@ -110,6 +114,7 @@
     </script>
   </head>
   <body>
+    <!-- i18n:body -->
     <div id="app">
       <noscript>
         <p class="noscript">Ce minuteur a besoin de JavaScript et de WebAssembly pour fonctionner.</p>
@@ -187,8 +192,10 @@
       </details>
 
       <footer>
+        <a href="en/" hreflang="en" lang="en">English version</a> ·
         <a href="https://github.com/DOMESDAY7/pomo">Code source sur GitHub</a>
       </footer>
     </article>
+    <!-- /i18n:body -->
   </body>
 </html>

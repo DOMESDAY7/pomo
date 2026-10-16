@@ -6,9 +6,9 @@
 
 **Minuteur Pomodoro gratuit, sans pub et open source, écrit en Rust et compilé en WebAssembly.**
 
-Notifications du navigateur · Webhooks Discord, Slack, ntfy, Gotify · Fonctionne hors ligne
+Notifications du navigateur · Webhooks Discord, Slack, ntfy, Gotify · Fonctionne hors ligne · Français / English
 
-[**▶ Essayer sur pomo.domesday.fr**](https://pomo.domesday.fr/)
+[**▶ Essayer sur pomo.domesday.fr**](https://pomo.domesday.fr/) · [**English version**](https://pomo.domesday.fr/en/)
 
 [![Deploy](https://github.com/DOMESDAY7/pomo/actions/workflows/deploy.yml/badge.svg)](https://github.com/DOMESDAY7/pomo/actions/workflows/deploy.yml)
 ![Rust](https://img.shields.io/badge/Rust-WebAssembly-b7410e?logo=rust)
@@ -34,12 +34,15 @@ Notifications du navigateur · Webhooks Discord, Slack, ntfy, Gotify · Fonction
 | 🪝 **Webhooks** | Discord, Slack / Mattermost, ntfy, Gotify, ou n'importe quel service avec un corps de requête personnalisé. Plusieurs webhooks en même temps. |
 | 📴 **Hors ligne** | Installable comme une application (PWA). Sans connexion, les webhooks sont ignorés et la notification du navigateur prend le relais. |
 | 🔒 **Vie privée** | Aucun compte, aucun pistage, aucun serveur. Les réglages et les URLs de webhook restent dans le navigateur. |
+| 🌍 **Français / anglais** | Deux pages, `/` et `/en/`, chacune indexable avec ses balises `hreflang`. L'interface, les messages par défaut et les notifications suivent la langue de la page. |
+| ♿ **Accessible** | Contrastes conformes WCAG AA (vérifiés avec axe-core) dans les trois modes. |
 | ⚡ **Léger** | Environ 200 Ko de WebAssembly, sans framework JS. |
 
 Le temps est calculé à partir de l'heure de fin prévue : le minuteur reste exact même quand l'onglet est en arrière-plan. Le temps restant s'affiche dans le titre de l'onglet.
 
 <div align="center">
-<img src="docs/settings.png" alt="Réglages" width="70%" />
+<img src="docs/settings.png" alt="Réglages" width="49%" />
+<img src="docs/settings-en.png" alt="Settings" width="49%" />
 </div>
 
 ## Webhooks
@@ -74,7 +77,7 @@ Dans un corps personnalisé, les valeurs sont échappées automatiquement selon 
 
 ## Développement
 
-Prérequis : [Rust](https://rustup.rs) et [trunk](https://trunkrs.dev).
+Prérequis : [Rust](https://rustup.rs), [trunk](https://trunkrs.dev) et `python3` (pour le hook qui génère la page anglaise).
 
 ```bash
 rustup target add wasm32-unknown-unknown
@@ -89,9 +92,12 @@ trunk build --release    # build optimisé dans dist/
 ```
 src/
 ├── main.rs       # UI Leptos, état du minuteur, réglages
+├── i18n.rs       # textes FR / EN, langue lue dans <html lang>
 ├── webhook.rs    # formats par service, envoi des requêtes
 └── notify.rs     # notifications navigateur (via le service worker si présent)
-index.html        # point d'entrée trunk + contenu statique, méta SEO, JSON-LD
+index.html        # point d'entrée trunk + contenu statique FR, méta SEO, JSON-LD
+i18n/en.html      # blocs anglais qui remplacent les zones <!-- i18n:… --> d'index.html
+scripts/build_en.py  # hook post_build (Trunk.toml) qui génère dist/en/index.html
 style.css
 sw.js             # service worker : cache hors ligne, clic sur notification
 manifest.webmanifest
@@ -112,3 +118,7 @@ Le build cible la racine du domaine (`--public-url /`). Pour servir le site sous
 - [Leptos](https://leptos.dev) 0.8 en mode CSR, réactivité fine sans DOM virtuel
 - [wasm-bindgen](https://github.com/rustwasm/wasm-bindgen) / [web-sys](https://docs.rs/web-sys) pour les API du navigateur (Fetch, Notifications, Web Audio, Service Worker)
 - [trunk](https://trunkrs.dev) pour le build, avec `wasm-opt -Oz`
+
+### Traductions
+
+Les textes de l'application sont dans `src/i18n.rs`, un `Strings` par langue : le compilateur refuse une traduction incomplète. Le contenu statique (titre, description, FAQ, JSON-LD) est dans `index.html` pour le français et dans `i18n/en.html` pour l'anglais. Une FAQ modifiée doit l'être aux deux endroits de chaque fichier : le texte visible et le JSON-LD.
