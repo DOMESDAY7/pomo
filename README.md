@@ -146,6 +146,8 @@ src/
 └── notify.rs     # notifications navigateur (via le service worker si présent)
 index.html        # point d'entrée trunk + contenu statique FR, méta SEO, JSON-LD
 i18n/<langue>.html   # blocs traduits qui remplacent les zones <!-- i18n:… --> d'index.html
+pages/               # pages statiques copiées au build (comparaisons)
+llms.txt             # résumé pour les LLM
 scripts/build_lang_pages.py  # hook post_build (Trunk.toml) qui génère dist/<langue>/index.html
 style.css
 sw.js             # service worker : cache hors ligne, clic sur notification
@@ -173,6 +175,14 @@ Le build cible la racine du domaine (`--public-url /`). Pour servir le site sous
 Les textes de l'application sont dans `src/i18n.rs`, un `Strings` par langue : le compilateur refuse une traduction incomplète. Le contenu statique (titre, description, FAQ, JSON-LD) est dans `index.html` pour le français et dans `i18n/<langue>.html` pour les autres langues. Une question de FAQ doit être identique dans le texte visible et dans le JSON-LD de la même page.
 
 Pour ajouter une langue : une variante dans `Lang` et un `Strings` dans `src/i18n.rs`, un fichier `i18n/<code>.html`, puis les liens `hreflang` d'`index.html`, le `sitemap.xml` et la liste du service worker.
+
+### Visibilité (moteurs de recherche et IA)
+
+- `robots.txt` autorise tous les robots, y compris explicitement ceux des assistants IA (GPTBot, OAI-SearchBot, ClaudeBot, PerplexityBot, Google-Extended…), et exclut les URLs d'overlay OBS.
+- `llms.txt` résume l'outil, ses fonctions et ses pages pour les LLM.
+- `sitemap.xml` liste les 5 langues et les pages de comparaison, avec leurs `hreflang`.
+- Pages de comparaison statiques dans `pages/` (copiées telles quelles au build) : [`/alternative-pomofocus/`](https://pomo.domesday.fr/alternative-pomofocus/) et [`/en/pomofocus-alternative/`](https://pomo.domesday.fr/en/pomofocus-alternative/).
+- **IndexNow** : après chaque déploiement, le workflow notifie Bing, Yandex, Seznam… des pages modifiées. La clé est publique par conception (`<clé>.txt` à la racine). L'étape n'échoue jamais le déploiement.
 
 ### Mesure d'audience
 

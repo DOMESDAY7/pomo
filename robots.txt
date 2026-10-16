@@ -1,4 +1,25 @@
+# Search engines and AI assistants are welcome to read and cite this site.
 User-agent: *
 Allow: /
+# OBS overlay URLs are the same app with a transparent background.
+Disallow: /*?overlay=
+
+# AI search and assistant crawlers, explicitly allowed.
+User-agent: GPTBot
+User-agent: OAI-SearchBot
+User-agent: ChatGPT-User
+User-agent: ClaudeBot
+User-agent: Claude-SearchBot
+User-agent: Claude-User
+User-agent: PerplexityBot
+User-agent: Perplexity-User
+User-agent: Google-Extended
+User-agent: Applebot-Extended
+User-agent: Amazonbot
+User-agent: DuckAssistBot
+User-agent: MistralAI-User
+User-agent: CCBot
+Allow: /
+Disallow: /*?overlay=
 
 Sitemap: https://pomo.domesday.fr/sitemap.xml

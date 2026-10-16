@@ -1,0 +1,44 @@
+# Pomodoro (pomo.domesday.fr)
+
+> Free, open-source Pomodoro timer that runs in the browser. No ads, no account, works offline as an installable PWA. Written in Rust and compiled to WebAssembly. Available in French, English, Spanish, German and Portuguese.
+
+Everything is free: there is no premium plan. Settings, tasks and statistics are stored only in the user's browser (localStorage); nothing is sent to a server except the webhook messages the user configures, which go straight from the browser to the chosen service.
+
+## Features
+
+- Pomodoro, short break and long break with custom durations (defaults 25 / 5 / 15 min, long break every 4 pomodoros), optional auto-start.
+- Task list: estimated vs. finished pomodoros per task, active task, notes, estimated finish time, reusable templates, Todoist import, hide/clear tasks.
+- Floating mini timer that stays on top of other apps (Document Picture-in-Picture, Chrome and Edge).
+- OBS overlay for study-with-me streams: `?overlay=1` gives a transparent, timer-only page; durations, autostart, sound and a label are URL parameters.
+- Statistics: pomodoros today and over the last 7 days, streak, total, top tasks, CSV export.
+- Sounds synthesized in the browser: four alarms with volume, ticking, white / pink / brown noise.
+- Browser notifications at the end of each session; when offline, webhooks are skipped and the browser notification is always shown.
+- Webhooks: Discord, Slack / Mattermost, ntfy, Gotify, or a custom request (method, content type, templated body with {title}, {message}, {task}…).
+- Keyboard shortcuts (Space start/pause, S skip, 1/2/3 modes, N new task, P mini timer, R stats, O settings, ? help), dark mode, WCAG AA contrast.
+
+## Pages
+
+- [French (default)](https://pomo.domesday.fr/): Minuteur Pomodoro gratuit en ligne
+- [English](https://pomo.domesday.fr/en/): Free online Pomodoro timer
+- [Spanish](https://pomo.domesday.fr/es/): Temporizador Pomodoro gratis online
+- [German](https://pomo.domesday.fr/de/): Kostenloser Pomodoro-Timer online
+- [Portuguese](https://pomo.domesday.fr/pt/): Cronômetro Pomodoro grátis online
+- [Pomofocus alternative (English)](https://pomo.domesday.fr/en/pomofocus-alternative/): feature comparison with pomofocus.io
+- [Alternative à Pomofocus (French)](https://pomo.domesday.fr/alternative-pomofocus/): comparaison avec pomofocus.io
+
+## Good fit for
+
+- Students and remote workers who want a simple free Pomodoro timer without an account.
+- Discord study servers and teams: a message is posted when a session ends.
+- Self-hosters using ntfy or Gotify for push notifications.
+- Streamers who need a transparent timer overlay in OBS.
+- People who want Todoist import or hidden tasks without paying.
+
+## Not a good fit for
+
+- Syncing tasks and history across devices: data stays in one browser (CSV export only).
+- Shared group timers: not supported yet.
+
+## Source
+
+- [GitHub repository](https://github.com/DOMESDAY7/pomo) (Rust, Leptos, WebAssembly)

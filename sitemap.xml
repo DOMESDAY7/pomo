@@ -50,4 +50,18 @@
     <xhtml:link rel="alternate" hreflang="pt" href="https://pomo.domesday.fr/pt/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/" />
   </url>
+  <url>
+    <loc>https://pomo.domesday.fr/alternative-pomofocus/</loc>
+    <lastmod>2026-10-16</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/alternative-pomofocus/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/pomofocus-alternative/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/pomofocus-alternative/" />
+  </url>
+  <url>
+    <loc>https://pomo.domesday.fr/en/pomofocus-alternative/</loc>
+    <lastmod>2026-10-16</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/alternative-pomofocus/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/pomofocus-alternative/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/pomofocus-alternative/" />
+  </url>
 </urlset>

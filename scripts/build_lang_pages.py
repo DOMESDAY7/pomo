@@ -1,4 +1,5 @@
-"""Trunk post_build hook: derive one page per language from the built index.html.
+"""Trunk post_build hook: derive one page per language from the built index.html,
+then copy the standalone pages of pages/ (e.g. comparison pages) into the site.
 
 For every i18n/<code>.html, the blocks between <!-- i18n:NAME --> and
 <!-- /i18n:NAME --> markers in index.html are replaced with the matching
@@ -9,6 +10,7 @@ page lives one level down, so a <base href="../"> keeps every relative URL
 
 import os
 import re
+import shutil
 import sys
 from pathlib import Path
 
@@ -51,6 +53,11 @@ def main() -> None:
     page = (staging / "index.html").read_text(encoding="utf-8")
     for source in sources:
         build(page, source, staging)
+
+    pages = Path(os.environ.get("TRUNK_SOURCE_DIR", ".")) / "pages"
+    if pages.is_dir():
+        shutil.copytree(pages, staging, dirs_exist_ok=True)
+        print(f"build_lang_pages: copied {pages}/ into the site")
 
 
 if __name__ == "__main__":
