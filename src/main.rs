@@ -1,9 +1,12 @@
+mod notify;
+mod webhook;
+
 use leptos::prelude::*;
 use leptos::task::spawn_local;
+use notify::Permission;
 use serde::{Deserialize, Serialize};
 use std::time::Duration;
-use wasm_bindgen::{JsCast, JsValue};
-use wasm_bindgen_futures::JsFuture;
+use webhook::{Delivery, Kind, Vars, Webhook};
 
 const STORAGE_KEY: &str = "pomo.settings";
 
@@ -42,11 +45,15 @@ struct Settings {
     auto_start_breaks: bool,
     auto_start_pomodoros: bool,
     sound: bool,
-    webhook_url: String,
+    browser_notify: bool,
+    webhooks: Vec<Webhook>,
     notify_pomodoro_end: bool,
     notify_break_end: bool,
     msg_pomodoro_end: String,
     msg_break_end: String,
+    /// Pre-multi-webhook setting, migrated to a Discord entry on load.
+    #[serde(skip_serializing)]
+    webhook_url: String,
 }
 
 impl Default for Settings {
@@ -59,11 +66,13 @@ impl Default for Settings {
             auto_start_breaks: false,
             auto_start_pomodoros: false,
             sound: true,
-            webhook_url: String::new(),
+            browser_notify: true,
+            webhooks: Vec::new(),
             notify_pomodoro_end: true,
             notify_break_end: true,
             msg_pomodoro_end: "🍅 Pomodoro #{count} terminé ! Place à la {next} ({min} min).".into(),
             msg_break_end: "⏰ {mode} terminée, retour au travail !".into(),
+            webhook_url: String::new(),
         }
     }
 }
@@ -82,16 +91,29 @@ impl Settings {
     }
 
     fn load() -> Self {
-        storage()
+        let mut s: Settings = storage()
             .and_then(|s| s.get_item(STORAGE_KEY).ok().flatten())
             .and_then(|raw| serde_json::from_str(&raw).ok())
-            .unwrap_or_default()
+            .unwrap_or_default();
+        let legacy = std::mem::take(&mut s.webhook_url);
+        if !legacy.trim().is_empty() && s.webhooks.is_empty() {
+            s.webhooks.push(Webhook { id: 1, url: legacy, ..Webhook::default() });
+        }
+        s
     }
 
     fn save(&self) {
         if let (Some(s), Ok(raw)) = (storage(), serde_json::to_string(self)) {
             let _ = s.set_item(STORAGE_KEY, &raw);
         }
+    }
+
+    fn webhook(&self, id: u32) -> Option<&Webhook> {
+        self.webhooks.iter().find(|w| w.id == id)
+    }
+
+    fn webhook_mut(&mut self, id: u32) -> Option<&mut Webhook> {
+        self.webhooks.iter_mut().find(|w| w.id == id)
     }
 }
 
@@ -199,17 +221,45 @@ impl Timer {
             if s.sound {
                 beep();
             }
-            let (enabled, template) = match finished {
+            let (webhooks_wanted, template) = match finished {
                 Mode::Pomodoro => (s.notify_pomodoro_end, &s.msg_pomodoro_end),
                 _ => (s.notify_break_end, &s.msg_break_end),
             };
-            if enabled && !s.webhook_url.trim().is_empty() {
-                let msg = template
-                    .replace("{count}", &self.completed.get_untracked().to_string())
-                    .replace("{mode}", finished.label())
-                    .replace("{next}", next.label())
-                    .replace("{min}", &s.minutes(next).to_string());
-                self.send(msg);
+            let title = match finished {
+                Mode::Pomodoro => "🍅 Pomodoro terminé",
+                _ => "⏰ Pause terminée",
+            };
+            let mut vars: Vars = vec![
+                ("count", self.completed.get_untracked().to_string()),
+                ("mode", finished.label().to_string()),
+                ("next", next.label().to_string()),
+                ("min", s.minutes(next).to_string()),
+            ];
+            let msg = webhook::render(template, &vars, str::to_string);
+            vars.push(("title", title.to_string()));
+            vars.push(("message", msg.clone()));
+
+            let hooks: Vec<Webhook> = s
+                .webhooks
+                .iter()
+                .filter(|w| w.enabled && !w.url.trim().is_empty())
+                .cloned()
+                .collect();
+            let wants_webhooks = webhooks_wanted && !hooks.is_empty();
+            let online = notify::is_online();
+
+            // Offline: webhooks can't go out, so the browser notification is
+            // the only channel left and is shown even if it was turned off.
+            if s.browser_notify || (wants_webhooks && !online) {
+                notify::show(title, &msg);
+            }
+            if wants_webhooks {
+                if online {
+                    self.send_all(hooks, title.to_string(), msg, vars);
+                } else {
+                    self.webhook_status
+                        .set("Hors ligne : webhooks ignorés, notification navigateur seulement".into());
+                }
             }
         }
 
@@ -223,47 +273,39 @@ impl Timer {
         }
     }
 
-    fn send(self, msg: String) {
-        let url = self.settings.with_untracked(|s| s.webhook_url.trim().to_string());
+    fn send_all(self, hooks: Vec<Webhook>, title: String, msg: String, vars: Vars) {
         self.webhook_status.set("Envoi…".into());
         spawn_local(async move {
-            let status = match send_webhook(&url, &msg).await {
-                Ok(()) => "✓ Message envoyé".to_string(),
-                Err(e) => format!("✗ Échec : {e}"),
-            };
-            self.webhook_status.set(status);
+            let mut lines = Vec::new();
+            for hook in &hooks {
+                let result = match webhook::send(hook, &title, &msg, &vars).await {
+                    Ok(Delivery::Confirmed) => "✓ envoyé".to_string(),
+                    Ok(Delivery::Sent) => "✓ envoyé (réponse non lisible)".to_string(),
+                    Err(e) => format!("✗ {e}"),
+                };
+                lines.push(format!("{} : {result}", hook.kind.label()));
+            }
+            self.webhook_status.set(lines.join(" · "));
         });
     }
-}
 
-fn js_err(e: JsValue) -> String {
-    e.as_string()
-        .or_else(|| js_sys::JSON::stringify(&e).ok().and_then(|s| s.as_string()))
-        .unwrap_or_else(|| "erreur inconnue".into())
-}
-
-/// POST to a Discord webhook. Sent as multipart form data (`payload_json`)
-/// so the browser treats it as a simple request and skips the CORS preflight.
-async fn send_webhook(url: &str, content: &str) -> Result<(), String> {
-    if !url.starts_with("https://") {
-        return Err("l'URL doit commencer par https://".into());
-    }
-    let form = web_sys::FormData::new().map_err(js_err)?;
-    let payload = serde_json::json!({ "content": content }).to_string();
-    form.append_with_str("payload_json", &payload).map_err(js_err)?;
-
-    let init = web_sys::RequestInit::new();
-    init.set_method("POST");
-    init.set_body(&form);
-
-    let resp = JsFuture::from(window().fetch_with_str_and_init(url, &init))
-        .await
-        .map_err(js_err)?;
-    let resp: web_sys::Response = resp.dyn_into().map_err(js_err)?;
-    if resp.ok() {
-        Ok(())
-    } else {
-        Err(format!("HTTP {}", resp.status()))
+    fn test_webhook(self, id: u32) {
+        let Some(hook) = self.settings.with_untracked(|s| s.webhook(id).cloned()) else { return };
+        if !notify::is_online() {
+            self.webhook_status.set("Hors ligne : impossible de tester".into());
+            return;
+        }
+        let title = "🔔 Test Pomodoro".to_string();
+        let msg = "Test du webhook Pomodoro".to_string();
+        let vars: Vars = vec![
+            ("title", title.clone()),
+            ("message", msg.clone()),
+            ("count", self.completed.get_untracked().to_string()),
+            ("mode", self.mode.get_untracked().label().to_string()),
+            ("next", self.next_mode().label().to_string()),
+            ("min", "0".into()),
+        ];
+        self.send_all(vec![hook], title, msg, vars);
     }
 }
 
@@ -287,6 +329,7 @@ fn beep() {
 fn App() -> impl IntoView {
     let timer = Timer::new();
     let show_settings = RwSignal::new(false);
+    let online = RwSignal::new(notify::is_online());
 
     let interval = set_interval_with_handle(move || timer.tick(), Duration::from_millis(250)).ok();
     on_cleanup(move || {
@@ -294,6 +337,8 @@ fn App() -> impl IntoView {
             h.clear();
         }
     });
+    let _ = window_event_listener(leptos::ev::online, move |_| online.set(true));
+    let _ = window_event_listener(leptos::ev::offline, move |_| online.set(false));
 
     // Persist settings, and apply new durations right away if the timer is idle.
     Effect::new(move |_| {
@@ -324,11 +369,15 @@ fn App() -> impl IntoView {
     view! {
         <div class=move || format!("app {}", timer.mode.get().class())>
             <header>
-                <h1>"⏱ Pomodoro"</h1>
+                <h1><img class="logo" src="icons/icon-192.png" alt="" />"Pomodoro"</h1>
                 <button class="icon-btn" on:click=move |_| show_settings.update(|v| *v = !*v)>
                     "⚙ Réglages"
                 </button>
             </header>
+
+            <Show when=move || !online.get()>
+                <p class="offline">"Hors ligne : seules les notifications du navigateur fonctionnent"</p>
+            </Show>
 
             <main class="card">
                 <nav class="tabs">{tab(Mode::Pomodoro)}{tab(Mode::Short)}{tab(Mode::Long)}</nav>
@@ -337,7 +386,12 @@ fn App() -> impl IntoView {
                     <button
                         class="start"
                         class:pressed=move || timer.running.get()
-                        on:click=move |_| timer.toggle()
+                        on:click=move |_| {
+                            if timer.settings.with_untracked(|s| s.browser_notify) {
+                                notify::request(|_| {});
+                            }
+                            timer.toggle()
+                        }
                     >
                         {move || if timer.running.get() { "PAUSE" } else { "START" }}
                     </button>
@@ -365,6 +419,7 @@ fn App() -> impl IntoView {
 #[component]
 fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'static) -> impl IntoView {
     let s = timer.settings;
+    let perm = RwSignal::new(notify::permission());
 
     let num = move |label: &'static str, get: fn(&Settings) -> u32, set: fn(&mut Settings, u32)| {
         view! {
@@ -411,6 +466,13 @@ fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'stati
         }
     };
 
+    let add_webhook = move |_| {
+        s.update(|s| {
+            let id = s.webhooks.iter().map(|w| w.id).max().unwrap_or(0) + 1;
+            s.webhooks.push(Webhook { id, ..Webhook::default() });
+        })
+    };
+
     view! {
         <div class="overlay" on:click=move |_| on_close()>
             <section class="panel" on:click=|ev| ev.stop_propagation()>
@@ -430,42 +492,167 @@ fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'stati
                 {check("Démarrer les pomodoros automatiquement", |s| s.auto_start_pomodoros, |s, v| s.auto_start_pomodoros = v)}
                 {check("Son à la fin", |s| s.sound, |s, v| s.sound = v)}
 
-                <h3>"Webhook Discord"</h3>
-                <label class="field wide">
-                    <span>"URL du webhook"</span>
+                <h3>"Notifications du navigateur"</h3>
+                <label class="toggle">
+                    <span>"Notifier à la fin de chaque session"</span>
                     <input
-                        type="password"
-                        placeholder="https://discord.com/api/webhooks/…"
-                        prop:value=move || s.with(|s| s.webhook_url.clone())
-                        on:change=move |ev| s.update(|s| s.webhook_url = event_target_value(&ev).trim().to_string())
+                        type="checkbox"
+                        prop:checked=move || s.with(|s| s.browser_notify)
+                        on:change=move |ev| {
+                            let on = event_target_checked(&ev);
+                            s.update(|s| s.browser_notify = on);
+                            if on {
+                                notify::request(move |p| perm.set(p));
+                            }
+                        }
                     />
                 </label>
-                {check("Notifier à la fin d'un pomodoro", |s| s.notify_pomodoro_end, |s, v| s.notify_pomodoro_end = v)}
-                {text("Message fin de pomodoro", |s| s.msg_pomodoro_end.clone(), |s, v| s.msg_pomodoro_end = v)}
-                {check("Notifier à la fin d'une pause", |s| s.notify_break_end, |s, v| s.notify_break_end = v)}
-                {text("Message fin de pause", |s| s.msg_break_end.clone(), |s, v| s.msg_break_end = v)}
-                <p class="hint">
-                    "Variables : {count} {mode} {next} {min}. L'URL reste stockée uniquement dans ce navigateur."
-                </p>
                 <div class="row">
                     <button
                         class="test"
-                        disabled=move || s.with(|s| s.webhook_url.trim().is_empty())
-                        on:click=move |_| timer.send("🔔 Test du webhook Pomodoro".into())
+                        disabled=move || matches!(perm.get(), Permission::Unsupported | Permission::Denied)
+                        on:click=move |_| {
+                            notify::request(move |p| {
+                                perm.set(p);
+                                notify::show("🔔 Pomodoro", "Les notifications fonctionnent !");
+                            })
+                        }
                     >
-                        "Envoyer un test"
+                        {move || if perm.get() == Permission::Granted { "Tester" } else { "Autoriser" }}
                     </button>
-                    <span class="status">{move || timer.webhook_status.get()}</span>
+                    <span class="status">
+                        {move || match perm.get() {
+                            Permission::Granted => "✓ Autorisées",
+                            Permission::Denied => "✗ Bloquées : autorise-les dans les réglages du site",
+                            Permission::Unsupported => "Non supportées par ce navigateur",
+                            Permission::Default => "Permission pas encore demandée",
+                        }}
+                    </span>
                 </div>
+                <p class="hint">"Sans connexion, les webhooks sont ignorés et la notification du navigateur est toujours affichée."</p>
+
+                <h3>"Webhooks"</h3>
+                {check("Envoyer à la fin d'un pomodoro", |s| s.notify_pomodoro_end, |s, v| s.notify_pomodoro_end = v)}
+                {text("Message fin de pomodoro", |s| s.msg_pomodoro_end.clone(), |s, v| s.msg_pomodoro_end = v)}
+                {check("Envoyer à la fin d'une pause", |s| s.notify_break_end, |s, v| s.notify_break_end = v)}
+                {text("Message fin de pause", |s| s.msg_break_end.clone(), |s, v| s.msg_break_end = v)}
+                <p class="hint">
+                    "Variables : {count} {mode} {next} {min}, plus {title} et {message} dans un corps personnalisé. Les URLs restent stockées uniquement dans ce navigateur."
+                </p>
+
+                <For
+                    each=move || s.with(|s| s.webhooks.iter().map(|w| w.id).collect::<Vec<_>>())
+                    key=|id| *id
+                    children=move |id| view! { <WebhookEditor timer=timer id=id /> }
+                />
+                <div class="row">
+                    <button class="add" on:click=add_webhook>"+ Ajouter un webhook"</button>
+                </div>
+                <p class="status">{move || timer.webhook_status.get()}</p>
 
                 <div class="row end">
                     <button class="reset" on:click=move |_| s.update(|s| {
-                        *s = Settings { webhook_url: std::mem::take(&mut s.webhook_url), ..Settings::default() }
+                        *s = Settings { webhooks: std::mem::take(&mut s.webhooks), ..Settings::default() }
                     })>
                         "Réinitialiser"
                     </button>
                 </div>
             </section>
+        </div>
+    }
+}
+
+#[component]
+fn WebhookEditor(timer: Timer, id: u32) -> impl IntoView {
+    let s = timer.settings;
+    let get = move |f: fn(&Webhook) -> String| s.with(|s| s.webhook(id).map(f).unwrap_or_default());
+    let set = move |f: fn(&mut Webhook, String), v: String| {
+        s.update(|s| {
+            if let Some(w) = s.webhook_mut(id) {
+                f(w, v)
+            }
+        })
+    };
+    let kind = move || s.with(|s| s.webhook(id).map(|w| w.kind).unwrap_or(Kind::Custom));
+
+    view! {
+        <div class="hook">
+            <div class="hook-head">
+                <select
+                    prop:value=move || kind().id()
+                    on:change=move |ev| set(|w, v| w.kind = Kind::from_id(&v), event_target_value(&ev))
+                >
+                    {Kind::ALL.into_iter().map(|k| view! { <option value=k.id()>{k.label()}</option> }).collect_view()}
+                </select>
+                <label class="mini">
+                    <input
+                        type="checkbox"
+                        prop:checked=move || s.with(|s| s.webhook(id).is_some_and(|w| w.enabled))
+                        on:change=move |ev| {
+                            let on = event_target_checked(&ev);
+                            s.update(|s| if let Some(w) = s.webhook_mut(id) { w.enabled = on });
+                        }
+                    />
+                    "Actif"
+                </label>
+                <button class="close" title="Supprimer" on:click=move |_| s.update(|s| s.webhooks.retain(|w| w.id != id))>
+                    "🗑"
+                </button>
+            </div>
+            <input
+                class="hook-url"
+                type="password"
+                placeholder=move || kind().placeholder()
+                prop:value=move || get(|w| w.url.clone())
+                on:change=move |ev| set(|w, v| w.url = v.trim().to_string(), event_target_value(&ev))
+            />
+            <Show when=move || kind() == Kind::Custom>
+                <div class="grid two">
+                    <label class="field">
+                        <span>"Méthode"</span>
+                        <select
+                            prop:value=move || get(|w| w.method.clone())
+                            on:change=move |ev| set(|w, v| w.method = v, event_target_value(&ev))
+                        >
+                            <option value="POST">"POST"</option>
+                            <option value="PUT">"PUT"</option>
+                            <option value="PATCH">"PATCH"</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        <span>"Content-Type"</span>
+                        <input
+                            type="text"
+                            list="content-types"
+                            prop:value=move || get(|w| w.content_type.clone())
+                            on:change=move |ev| set(|w, v| w.content_type = v, event_target_value(&ev))
+                        />
+                        <datalist id="content-types">
+                            <option value="application/json" />
+                            <option value="text/plain" />
+                            <option value="application/x-www-form-urlencoded" />
+                        </datalist>
+                    </label>
+                </div>
+                <label class="field wide">
+                    <span>"Corps"</span>
+                    <textarea
+                        rows="3"
+                        prop:value=move || get(|w| w.body.clone())
+                        on:change=move |ev| set(|w, v| w.body = v, event_target_value(&ev))
+                    />
+                </label>
+                <p class="hint">
+                    "Hors text/plain et form-urlencoded, le serveur doit autoriser le CORS depuis cette page."
+                </p>
+            </Show>
+            <button
+                class="test"
+                disabled=move || get(|w| w.url.clone()).trim().is_empty()
+                on:click=move |_| timer.test_webhook(id)
+            >
+                "Envoyer un test"
+            </button>
         </div>
     }
 }

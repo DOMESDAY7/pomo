@@ -167,3 +167,47 @@ button { font: inherit; cursor: pointer; border: none; }
 .test:disabled { opacity: 0.4; cursor: not-allowed; }
 .reset { background: #eee; color: #666; }
 .status { font-size: 13px; color: #666; }
+
+/* Logo, offline banner */
+header h1 { display: flex; align-items: center; gap: 8px; }
+.logo { width: 32px; height: 32px; }
+.offline {
+  max-width: 480px;
+  margin: 16px 0 0;
+  padding: 8px 12px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  text-align: center;
+}
+
+/* Webhook editors */
+.hook {
+  border: 1px solid #eee;
+  border-radius: 6px;
+  padding: 12px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.hook-head { display: flex; align-items: center; gap: 10px; }
+.hook-head select { flex: 1; }
+.hook select, .hook textarea, .hook-url {
+  padding: 8px 10px;
+  border: none;
+  border-radius: 6px;
+  background: #efefef;
+  font: inherit;
+  font-size: 14px;
+  color: #555;
+  width: 100%;
+}
+.hook textarea { font-family: ui-monospace, monospace; resize: vertical; }
+.hook .test { align-self: flex-start; }
+.hook .field { margin-bottom: 0; }
+.mini { display: flex; align-items: center; gap: 4px; font-size: 13px; color: #777; white-space: nowrap; }
+.mini input { accent-color: var(--accent); }
+.grid.two { grid-template-columns: 1fr 1fr; }
+.add { background: #eee; color: #555; padding: 8px 14px; border-radius: 4px; font-size: 14px; }
+.panel p.status { margin: 8px 0 0; }

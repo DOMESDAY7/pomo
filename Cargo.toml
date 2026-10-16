@@ -18,6 +18,8 @@ features = [
   "Window", "Document", "Storage", "Request", "RequestInit", "Response", "FormData",
   "AudioContext", "BaseAudioContext", "OscillatorNode", "GainNode", "AudioParam",
   "AudioNode", "AudioDestinationNode", "AudioScheduledSourceNode",
+  "Notification", "NotificationOptions", "NotificationPermission",
+  "Navigator", "ServiceWorkerContainer", "ServiceWorkerRegistration", "ServiceWorker", "RequestMode",
 ]
 
 [profile.release]
