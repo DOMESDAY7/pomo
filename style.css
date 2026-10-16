@@ -1,0 +1,169 @@
+:root {
+  --pomodoro: #ba4949;
+  --short: #38858a;
+  --long: #397097;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  min-height: 100%;
+  font-family: "Arial Rounded MT Bold", "Nunito", system-ui, -apple-system, sans-serif;
+  color: #fff;
+}
+
+body { background: var(--pomodoro); }
+
+.app {
+  --accent: var(--pomodoro);
+  min-height: 100vh;
+  padding: 16px;
+  background: var(--accent);
+  transition: background-color 0.6s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.app.mode-short { --accent: var(--short); }
+.app.mode-long { --accent: var(--long); }
+
+header {
+  width: 100%;
+  max-width: 620px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+header h1 { font-size: 20px; margin: 0; }
+
+button { font: inherit; cursor: pointer; border: none; }
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.icon-btn:hover { background: rgba(255, 255, 255, 0.3); }
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  margin-top: 40px;
+  padding: 20px 0 30px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  text-align: center;
+}
+
+.tabs { display: flex; justify-content: center; gap: 4px; flex-wrap: wrap; }
+.tab {
+  background: transparent;
+  color: #fff;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 16px;
+}
+.tab.active { background: rgba(0, 0, 0, 0.15); font-weight: bold; }
+
+.time {
+  font-size: clamp(72px, 24vw, 120px);
+  font-weight: bold;
+  margin: 20px 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.controls { display: flex; justify-content: center; align-items: center; gap: 16px; position: relative; }
+
+.start {
+  width: 200px;
+  height: 55px;
+  background: #fff;
+  color: var(--accent);
+  font-size: 22px;
+  font-weight: bold;
+  border-radius: 4px;
+  box-shadow: rgb(235, 235, 235) 0 6px 0;
+  transition: color 0.5s, box-shadow 0.1s, transform 0.1s;
+}
+.start.pressed { transform: translateY(6px); box-shadow: none; }
+
+.skip {
+  position: absolute;
+  left: calc(50% + 116px);
+  background: transparent;
+  color: #fff;
+  font-size: 28px;
+  padding: 4px;
+}
+
+.count { text-align: center; margin-top: 20px; opacity: 0.85; line-height: 1.5; }
+
+/* Settings */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 16px;
+  overflow-y: auto;
+}
+.panel {
+  background: #fff;
+  color: #333;
+  width: 100%;
+  max-width: 420px;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+.panel-head { display: flex; justify-content: space-between; align-items: center; }
+.panel h2 { margin: 0; font-size: 18px; color: #555; }
+.panel h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #aaa;
+  margin: 22px 0 10px;
+}
+.close { background: none; font-size: 18px; color: #999; }
+
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.field { display: flex; flex-direction: column; gap: 4px; font-size: 13px; color: #888; margin-bottom: 10px; }
+.field input {
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: #efefef;
+  font-size: 15px;
+  color: #555;
+  width: 100%;
+}
+.toggle {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 15px;
+  color: #555;
+  padding: 8px 0;
+}
+.toggle input { width: 20px; height: 20px; accent-color: var(--accent); }
+
+.hint { font-size: 12px; color: #999; margin: 4px 0 10px; }
+.row { display: flex; align-items: center; gap: 12px; }
+.row.end { justify-content: flex-end; margin-top: 20px; padding-top: 14px; border-top: 1px solid #eee; }
+.test, .reset {
+  padding: 8px 14px;
+  border-radius: 4px;
+  font-size: 14px;
+}
+.test { background: #5865f2; color: #fff; }
+.test:disabled { opacity: 0.4; cursor: not-allowed; }
+.reset { background: #eee; color: #666; }
+.status { font-size: 13px; color: #666; }
