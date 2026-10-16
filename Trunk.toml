@@ -1,4 +1,4 @@
 [[hooks]]
 stage = "post_build"
 command = "python3"
-command_arguments = ["scripts/build_en.py"]
+command_arguments = ["scripts/build_lang_pages.py"]

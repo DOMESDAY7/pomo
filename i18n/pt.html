@@ -1,0 +1,176 @@
+<!-- Português replacements for the marked blocks of index.html. -->
+<!-- Built into /pt/index.html by scripts/build_lang_pages.py (trunk post_build hook). -->
+
+<!-- i18n:head -->
+    <title>Cronômetro Pomodoro grátis online – avisos no Discord, Slack e ntfy</title>
+    <meta name="description" content="Cronômetro Pomodoro grátis, sem anúncios e sem conta: tarefas, estatísticas, mini cronômetro flutuante, overlay para OBS, ruído branco, modo escuro. Funciona offline, com notificações e webhooks do Discord, Slack e ntfy. Código aberto." />
+    <link rel="canonical" href="https://pomo.domesday.fr/pt/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="pt_BR" />
+    <meta property="og:locale:alternate" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="de_DE" />
+    <meta property="og:site_name" content="Pomodoro" />
+    <meta property="og:url" content="https://pomo.domesday.fr/pt/" />
+    <meta property="og:title" content="Cronômetro Pomodoro grátis online" />
+    <meta property="og:description" content="Grátis, sem anúncios, offline. Tarefas, estatísticas, mini cronômetro flutuante, overlay para OBS, webhooks do Discord, Slack e ntfy." />
+    <meta property="og:image" content="https://pomo.domesday.fr/og-pt.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Mascote tomate e um cronômetro 25:00" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cronômetro Pomodoro grátis online" />
+    <meta name="twitter:description" content="Grátis, sem anúncios, offline. Tarefas, estatísticas, mini cronômetro flutuante, overlay para OBS, webhooks do Discord, Slack e ntfy." />
+    <meta name="twitter:image" content="https://pomo.domesday.fr/og-pt.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Pomodoro",
+            "url": "https://pomo.domesday.fr/pt/",
+            "description": "Cronômetro Pomodoro grátis com lista de tarefas, estatísticas, mini cronômetro flutuante, overlay para OBS, notificações do navegador e webhooks do Discord, Slack, ntfy e Gotify. Funciona offline.",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "Qualquer (navegador web)",
+            "inLanguage": "pt",
+            "isAccessibleForFree": true,
+            "image": "https://pomo.domesday.fr/og-pt.png",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "BRL"
+            },
+            "featureList": [
+              "Lista de tarefas: pomodoros estimados e feitos, horário previsto de término, notas, modelos reutilizáveis e importação do Todoist.",
+              "Mini cronômetro flutuante: uma janelinha que fica por cima dos outros aplicativos (Chrome, Edge).",
+              "Overlay para OBS para lives “study with me”: fundo transparente, só o cronômetro, durações na URL.",
+              "Estatísticas: pomodoros de hoje e dos últimos 7 dias, sequência, tarefas mais trabalhadas, exportação CSV.",
+              "Sons: quatro alarmes, tique-taque, ruído branco, rosa ou marrom para ajudar no foco.",
+              "Notificações do navegador e webhooks do Discord, Slack, Mattermost, ntfy, Gotify ou personalizados.",
+              "Atalhos de teclado, modo escuro, durações e início automático ajustáveis.",
+              "Offline: instalável como aplicativo (PWA).",
+              "Privacidade: tudo fica no seu navegador. Leve, escrito em Rust e WebAssembly."
+            ],
+            "codeRepository": "https://github.com/DOMESDAY7/pomo"
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Como recebo um aviso no Discord quando um pomodoro termina?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No Discord, abra as configurações do canal, Integrações, Webhooks, crie um webhook e copie a URL. Nos ajustes do cronômetro, adicione um webhook do tipo Discord e cole a URL. O botão “Enviar um teste” confere se está tudo funcionando."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Como mostro o cronômetro no OBS?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Nos ajustes, seção “Overlay para OBS”, copie a URL sugerida e adicione-a como “Fonte de navegador” no OBS. O fundo é transparente e são usadas as durações que você escolheu."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "O cronômetro funciona offline?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sim. O site se instala como aplicativo (PWA) e continua funcionando sem conexão. Offline, os webhooks são ignorados e só a notificação do navegador é exibida."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Meus ajustes, tarefas e estatísticas são enviados a um servidor?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Não. Tudo fica salvo no seu navegador. Não há conta nem anúncios. As mensagens vão direto do seu navegador para o serviço escolhido."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "O cronômetro continua se eu trocar de aba?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sim. O tempo é calculado a partir do horário previsto de término, então continua exato mesmo com a aba em segundo plano. O tempo restante também aparece no título da aba."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /i18n:head -->
+
+<!-- i18n:body -->
+    <div id="app">
+      <noscript>
+        <p class="noscript">Este cronômetro precisa de JavaScript e WebAssembly para funcionar.</p>
+      </noscript>
+    </div>
+
+    <article class="about">
+      <h1>Cronômetro Pomodoro grátis online</h1>
+      <p>Um cronômetro Pomodoro simples, <strong>sem anúncios, sem conta e de código aberto</strong>. Ajuste a duração do trabalho e das pausas, organize suas tarefas, acompanhe suas estatísticas e receba uma notificação do navegador ou uma mensagem no <strong>Discord, Slack, ntfy ou Gotify</strong> no fim de cada sessão. Ele se instala como um aplicativo e funciona <strong>offline</strong>.</p>
+
+      <h2>O que é a técnica Pomodoro?</h2>
+      <p>A técnica Pomodoro é um método de gestão do tempo criado por Francesco Cirillo no fim dos anos 1980. O nome vem do timer de cozinha em forma de tomate que ele usava. A ideia: dividir o trabalho em sessões curtas e focadas, separadas por pausas de verdade.</p>
+
+      <h2>Como usar este cronômetro Pomodoro</h2>
+      <ol>
+        <li>Adicione a tarefa em que você está trabalhando.</li>
+        <li>Inicie o cronômetro: <strong>25 minutos</strong> de trabalho sem interrupção.</li>
+        <li>Quando tocar, faça uma <strong>pausa curta de 5 minutos</strong>.</li>
+        <li>Repita. Depois de <strong>4 pomodoros</strong>, faça uma <strong>pausa longa de 15 minutos</strong>.</li>
+      </ol>
+      <p>Todas as durações podem ser alteradas no menu “Ajustes”. Pressione <kbd>Espaço</kbd> para iniciar e <kbd>?</kbd> para ver todos os atalhos.</p>
+
+      <h2>Recursos</h2>
+      <ul>
+        <li><strong>Lista de tarefas</strong>: pomodoros estimados e feitos, horário previsto de término, notas, modelos reutilizáveis e <strong>importação do Todoist</strong>.</li>
+        <li><strong>Mini cronômetro flutuante</strong>: uma janelinha que fica por cima dos outros aplicativos (Chrome, Edge).</li>
+        <li><strong>Overlay para OBS</strong> para lives “study with me”: fundo transparente, só o cronômetro, durações na URL.</li>
+        <li><strong>Estatísticas</strong>: pomodoros de hoje e dos últimos 7 dias, sequência, tarefas mais trabalhadas, exportação CSV.</li>
+        <li><strong>Sons</strong>: quatro alarmes, tique-taque, ruído branco, rosa ou marrom para ajudar no foco.</li>
+        <li><strong>Notificações do navegador</strong> e <strong>webhooks</strong> do Discord, Slack, Mattermost, ntfy, Gotify ou personalizados.</li>
+        <li><strong>Atalhos de teclado</strong>, <strong>modo escuro</strong>, durações e início automático ajustáveis.</li>
+        <li><strong>Offline</strong>: instalável como aplicativo (PWA).</li>
+        <li><strong>Privacidade</strong>: tudo fica no seu navegador. Leve, escrito em Rust e WebAssembly.</li>
+      </ul>
+
+      <h2>Perguntas frequentes</h2>
+      <details>
+        <summary>Como recebo um aviso no Discord quando um pomodoro termina?</summary>
+        <p>No Discord, abra as configurações do canal, Integrações, Webhooks, crie um webhook e copie a URL. Nos ajustes do cronômetro, adicione um webhook do tipo Discord e cole a URL. O botão “Enviar um teste” confere se está tudo funcionando.</p>
+      </details>
+      <details>
+        <summary>Como mostro o cronômetro no OBS?</summary>
+        <p>Nos ajustes, seção “Overlay para OBS”, copie a URL sugerida e adicione-a como “Fonte de navegador” no OBS. O fundo é transparente e são usadas as durações que você escolheu.</p>
+      </details>
+      <details>
+        <summary>O cronômetro funciona offline?</summary>
+        <p>Sim. O site se instala como aplicativo (PWA) e continua funcionando sem conexão. Offline, os webhooks são ignorados e só a notificação do navegador é exibida.</p>
+      </details>
+      <details>
+        <summary>Meus ajustes, tarefas e estatísticas são enviados a um servidor?</summary>
+        <p>Não. Tudo fica salvo no seu navegador. Não há conta nem anúncios. As mensagens vão direto do seu navegador para o serviço escolhido.</p>
+      </details>
+      <details>
+        <summary>O cronômetro continua se eu trocar de aba?</summary>
+        <p>Sim. O tempo é calculado a partir do horário previsto de término, então continua exato mesmo com a aba em segundo plano. O tempo restante também aparece no título da aba.</p>
+      </details>
+
+      <footer>
+        <nav class="lang-links">
+        <a href="./" hreflang="fr" lang="fr">Français</a> ·
+        <a href="en/" hreflang="en" lang="en">English</a> ·
+        <a href="es/" hreflang="es" lang="es">Español</a> ·
+        <a href="de/" hreflang="de" lang="de">Deutsch</a>
+        </nav>
+        <a href="https://github.com/DOMESDAY7/pomo">Código-fonte no GitHub</a>
+      </footer>
+    </article>
+    <!-- /i18n:body -->

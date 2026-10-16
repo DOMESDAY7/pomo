@@ -1,0 +1,176 @@
+<!-- Deutsch replacements for the marked blocks of index.html. -->
+<!-- Built into /de/index.html by scripts/build_lang_pages.py (trunk post_build hook). -->
+
+<!-- i18n:head -->
+    <title>Kostenloser Pomodoro-Timer online – Benachrichtigungen per Discord, Slack, ntfy</title>
+    <meta name="description" content="Kostenloser Pomodoro-Timer ohne Werbung und ohne Konto: Aufgaben, Statistiken, schwebender Mini-Timer, OBS-Overlay, weißes Rauschen, Dunkelmodus. Funktioniert offline, mit Browser-Benachrichtigungen und Webhooks für Discord, Slack und ntfy. Open Source." />
+    <link rel="canonical" href="https://pomo.domesday.fr/de/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="de_DE" />
+    <meta property="og:locale:alternate" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+    <meta property="og:site_name" content="Pomodoro" />
+    <meta property="og:url" content="https://pomo.domesday.fr/de/" />
+    <meta property="og:title" content="Kostenloser Pomodoro-Timer online" />
+    <meta property="og:description" content="Kostenlos, ohne Werbung, offline. Aufgaben, Statistiken, schwebender Mini-Timer, OBS-Overlay, Webhooks für Discord, Slack, ntfy." />
+    <meta property="og:image" content="https://pomo.domesday.fr/og-de.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Tomaten-Maskottchen und ein 25:00-Timer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Kostenloser Pomodoro-Timer online" />
+    <meta name="twitter:description" content="Kostenlos, ohne Werbung, offline. Aufgaben, Statistiken, schwebender Mini-Timer, OBS-Overlay, Webhooks für Discord, Slack, ntfy." />
+    <meta name="twitter:image" content="https://pomo.domesday.fr/og-de.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Pomodoro",
+            "url": "https://pomo.domesday.fr/de/",
+            "description": "Kostenloser Pomodoro-Timer mit Aufgabenliste, Statistiken, schwebendem Mini-Timer, OBS-Overlay, Browser-Benachrichtigungen und Webhooks für Discord, Slack, ntfy und Gotify. Funktioniert offline.",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "Alle (Webbrowser)",
+            "inLanguage": "de",
+            "isAccessibleForFree": true,
+            "image": "https://pomo.domesday.fr/og-de.png",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            },
+            "featureList": [
+              "Aufgabenliste: geschätzte und erledigte Pomodoros, voraussichtliche Endzeit, Notizen, wiederverwendbare Vorlagen und Import aus Todoist.",
+              "Schwebender Mini-Timer: ein kleines Fenster, das über deinen anderen Apps bleibt (Chrome, Edge).",
+              "OBS-Overlay für „Study with me“-Streams: transparenter Hintergrund, nur der Timer, Zeiten in der URL.",
+              "Statistiken: Pomodoros heute und in den letzten 7 Tagen, Serie, meistbearbeitete Aufgaben, CSV-Export.",
+              "Klänge: vier Signale, Ticken, weißes, rosa oder braunes Rauschen für mehr Konzentration.",
+              "Browser-Benachrichtigungen und Webhooks für Discord, Slack, Mattermost, ntfy, Gotify oder eigene Dienste.",
+              "Tastenkürzel, Dunkelmodus, einstellbare Zeiten und automatischer Start.",
+              "Offline: als App installierbar (PWA).",
+              "Datenschutz: alles bleibt in deinem Browser. Leicht, geschrieben in Rust und WebAssembly."
+            ],
+            "codeRepository": "https://github.com/DOMESDAY7/pomo"
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Wie bekomme ich eine Discord-Benachrichtigung, wenn ein Pomodoro endet?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Öffne in Discord die Kanaleinstellungen, dann Integrationen, dann Webhooks, erstelle einen Webhook und kopiere seine URL. Füge in den Timer-Einstellungen einen Discord-Webhook hinzu und füge die URL ein. Mit „Test senden“ prüfst du, ob alles funktioniert."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Wie zeige ich den Timer in OBS an?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Kopiere in den Einstellungen im Abschnitt „OBS-Overlay“ die vorgeschlagene URL und füge sie in OBS als „Browserquelle“ hinzu. Der Hintergrund ist transparent, und es werden die von dir gewählten Zeiten verwendet."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Funktioniert der Timer offline?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Ja. Die Seite lässt sich als App (PWA) installieren und funktioniert ohne Verbindung. Offline werden Webhooks übersprungen und nur die Browser-Benachrichtigung angezeigt."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Werden meine Einstellungen, Aufgaben und Statistiken an einen Server gesendet?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Nein. Alles wird in deinem Browser gespeichert. Es gibt kein Konto und keine Werbung. Nachrichten gehen direkt von deinem Browser an den gewählten Dienst."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Läuft der Timer weiter, wenn ich den Tab wechsle?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Ja. Die Zeit wird aus der geplanten Endzeit berechnet und bleibt deshalb auch im Hintergrund genau. Die Restzeit steht außerdem im Tab-Titel."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /i18n:head -->
+
+<!-- i18n:body -->
+    <div id="app">
+      <noscript>
+        <p class="noscript">Dieser Timer benötigt JavaScript und WebAssembly.</p>
+      </noscript>
+    </div>
+
+    <article class="about">
+      <h1>Kostenloser Pomodoro-Timer online</h1>
+      <p>Ein einfacher Pomodoro-Timer <strong>ohne Werbung, ohne Konto und Open Source</strong>. Lege Arbeits- und Pausenzeiten fest, organisiere deine Aufgaben, verfolge deine Statistiken und erhalte am Ende jeder Sitzung eine Browser-Benachrichtigung oder eine Nachricht in <strong>Discord, Slack, ntfy oder Gotify</strong>. Er lässt sich als App installieren und funktioniert <strong>offline</strong>.</p>
+
+      <h2>Was ist die Pomodoro-Technik?</h2>
+      <p>Die Pomodoro-Technik ist eine Zeitmanagement-Methode, die Francesco Cirillo Ende der 1980er-Jahre entwickelt hat. Der Name stammt von der tomatenförmigen Küchenuhr, die er benutzte. Das Prinzip: Arbeit in kurze, konzentrierte Abschnitte mit echten Pausen dazwischen aufteilen.</p>
+
+      <h2>So benutzt du diesen Pomodoro-Timer</h2>
+      <ol>
+        <li>Füge die Aufgabe hinzu, an der du arbeitest.</li>
+        <li>Starte den Timer: <strong>25 Minuten</strong> ungestörte Arbeit.</li>
+        <li>Wenn er klingelt, mach eine <strong>kurze Pause von 5 Minuten</strong>.</li>
+        <li>Wiederhole das. Nach <strong>4 Pomodoros</strong> folgt eine <strong>lange Pause von 15 Minuten</strong>.</li>
+      </ol>
+      <p>Alle Zeiten lassen sich im Menü „Einstellungen“ ändern. Drücke <kbd>Leertaste</kbd> zum Starten und <kbd>?</kbd> für alle Tastenkürzel.</p>
+
+      <h2>Funktionen</h2>
+      <ul>
+        <li><strong>Aufgabenliste</strong>: geschätzte und erledigte Pomodoros, voraussichtliche Endzeit, Notizen, wiederverwendbare Vorlagen und <strong>Import aus Todoist</strong>.</li>
+        <li><strong>Schwebender Mini-Timer</strong>: ein kleines Fenster, das über deinen anderen Apps bleibt (Chrome, Edge).</li>
+        <li><strong>OBS-Overlay</strong> für „Study with me“-Streams: transparenter Hintergrund, nur der Timer, Zeiten in der URL.</li>
+        <li><strong>Statistiken</strong>: Pomodoros heute und in den letzten 7 Tagen, Serie, meistbearbeitete Aufgaben, CSV-Export.</li>
+        <li><strong>Klänge</strong>: vier Signale, Ticken, weißes, rosa oder braunes Rauschen für mehr Konzentration.</li>
+        <li><strong>Browser-Benachrichtigungen</strong> und <strong>Webhooks</strong> für Discord, Slack, Mattermost, ntfy, Gotify oder eigene Dienste.</li>
+        <li><strong>Tastenkürzel</strong>, <strong>Dunkelmodus</strong>, einstellbare Zeiten und automatischer Start.</li>
+        <li><strong>Offline</strong>: als App installierbar (PWA).</li>
+        <li><strong>Datenschutz</strong>: alles bleibt in deinem Browser. Leicht, geschrieben in Rust und WebAssembly.</li>
+      </ul>
+
+      <h2>Häufige Fragen</h2>
+      <details>
+        <summary>Wie bekomme ich eine Discord-Benachrichtigung, wenn ein Pomodoro endet?</summary>
+        <p>Öffne in Discord die Kanaleinstellungen, dann Integrationen, dann Webhooks, erstelle einen Webhook und kopiere seine URL. Füge in den Timer-Einstellungen einen Discord-Webhook hinzu und füge die URL ein. Mit „Test senden“ prüfst du, ob alles funktioniert.</p>
+      </details>
+      <details>
+        <summary>Wie zeige ich den Timer in OBS an?</summary>
+        <p>Kopiere in den Einstellungen im Abschnitt „OBS-Overlay“ die vorgeschlagene URL und füge sie in OBS als „Browserquelle“ hinzu. Der Hintergrund ist transparent, und es werden die von dir gewählten Zeiten verwendet.</p>
+      </details>
+      <details>
+        <summary>Funktioniert der Timer offline?</summary>
+        <p>Ja. Die Seite lässt sich als App (PWA) installieren und funktioniert ohne Verbindung. Offline werden Webhooks übersprungen und nur die Browser-Benachrichtigung angezeigt.</p>
+      </details>
+      <details>
+        <summary>Werden meine Einstellungen, Aufgaben und Statistiken an einen Server gesendet?</summary>
+        <p>Nein. Alles wird in deinem Browser gespeichert. Es gibt kein Konto und keine Werbung. Nachrichten gehen direkt von deinem Browser an den gewählten Dienst.</p>
+      </details>
+      <details>
+        <summary>Läuft der Timer weiter, wenn ich den Tab wechsle?</summary>
+        <p>Ja. Die Zeit wird aus der geplanten Endzeit berechnet und bleibt deshalb auch im Hintergrund genau. Die Restzeit steht außerdem im Tab-Titel.</p>
+      </details>
+
+      <footer>
+        <nav class="lang-links">
+        <a href="./" hreflang="fr" lang="fr">Français</a> ·
+        <a href="en/" hreflang="en" lang="en">English</a> ·
+        <a href="es/" hreflang="es" lang="es">Español</a> ·
+        <a href="pt/" hreflang="pt" lang="pt">Português</a>
+        </nav>
+        <a href="https://github.com/DOMESDAY7/pomo">Quellcode auf GitHub</a>
+      </footer>
+    </article>
+    <!-- /i18n:body -->

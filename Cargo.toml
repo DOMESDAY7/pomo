@@ -20,6 +20,9 @@ features = [
   "AudioNode", "AudioDestinationNode", "AudioScheduledSourceNode",
   "Notification", "NotificationOptions", "NotificationPermission",
   "Navigator", "ServiceWorkerContainer", "ServiceWorkerRegistration", "ServiceWorker", "RequestMode",
+  "AudioBuffer", "AudioBufferSourceNode", "OscillatorType", "AudioContextState",
+  "UrlSearchParams", "Location", "Blob", "BlobPropertyBag", "Url", "HtmlAnchorElement",
+  "Element", "HtmlElement", "DomTokenList", "KeyboardEvent", "EventTarget",
 ]
 
 [profile.release]

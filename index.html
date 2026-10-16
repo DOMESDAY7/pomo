@@ -5,32 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!-- i18n:head -->
     <title>Minuteur Pomodoro gratuit en ligne – notifications Discord, Slack, ntfy</title>
-    <meta
-      name="description"
-      content="Minuteur Pomodoro gratuit, sans pub et sans compte. Durées réglables, fonctionne hors ligne, notifications du navigateur et webhooks Discord, Slack, ntfy ou Gotify. Open source."
-    />
+    <meta name="description" content="Minuteur Pomodoro gratuit, sans pub et sans compte : tâches, statistiques, mini-minuteur flottant, overlay OBS, bruit blanc, mode sombre. Hors ligne, notifications et webhooks Discord, Slack, ntfy. Open source." />
     <link rel="canonical" href="https://pomo.domesday.fr/" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="de_DE" />
+    <meta property="og:locale:alternate" content="pt_BR" />
     <meta property="og:site_name" content="Pomodoro" />
     <meta property="og:url" content="https://pomo.domesday.fr/" />
     <meta property="og:title" content="Minuteur Pomodoro gratuit en ligne" />
-    <meta
-      property="og:description"
-      content="Gratuit, sans pub, hors ligne. Notifications du navigateur et webhooks Discord, Slack, ntfy."
-    />
+    <meta property="og:description" content="Gratuit, sans pub, hors ligne. Tâches, statistiques, mini-minuteur flottant, overlay OBS, webhooks Discord, Slack, ntfy." />
     <meta property="og:image" content="https://pomo.domesday.fr/og.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Mascotte tomate et minuteur 25:00" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Minuteur Pomodoro gratuit en ligne" />
-    <meta
-      name="twitter:description"
-      content="Gratuit, sans pub, hors ligne. Notifications du navigateur et webhooks Discord, Slack, ntfy."
-    />
+    <meta name="twitter:description" content="Gratuit, sans pub, hors ligne. Tâches, statistiques, mini-minuteur flottant, overlay OBS, webhooks Discord, Slack, ntfy." />
     <meta name="twitter:image" content="https://pomo.domesday.fr/og.png" />
-
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
@@ -39,13 +33,28 @@
             "@type": "WebApplication",
             "name": "Pomodoro",
             "url": "https://pomo.domesday.fr/",
-            "description": "Minuteur Pomodoro gratuit avec notifications du navigateur et webhooks Discord, Slack, ntfy et Gotify. Fonctionne hors ligne.",
+            "description": "Minuteur Pomodoro gratuit avec liste de tâches, statistiques, mini-minuteur flottant, overlay OBS, notifications du navigateur et webhooks Discord, Slack, ntfy et Gotify. Fonctionne hors ligne.",
             "applicationCategory": "ProductivityApplication",
             "operatingSystem": "Tous (navigateur web)",
             "inLanguage": "fr",
             "isAccessibleForFree": true,
             "image": "https://pomo.domesday.fr/og.png",
-            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "EUR" },
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            },
+            "featureList": [
+              "Liste de tâches : pomodoros estimés et réalisés, heure de fin prévue, notes, modèles réutilisables et import depuis Todoist.",
+              "Mini-minuteur flottant : une petite fenêtre qui reste au-dessus de vos autres applications (Chrome, Edge).",
+              "Overlay OBS pour les streams « study with me » : fond transparent, minuteur seul, durées dans l'URL.",
+              "Statistiques : pomodoros du jour et des 7 derniers jours, série de jours, tâches les plus travaillées, export CSV.",
+              "Sons : quatre sonneries, tic-tac, bruit blanc, rose ou brun pour se concentrer.",
+              "Notifications du navigateur et webhooks Discord, Slack, Mattermost, ntfy, Gotify ou personnalisés.",
+              "Raccourcis clavier, mode sombre, durées et démarrage automatique réglables.",
+              "Hors ligne : installable comme une application (PWA).",
+              "Respect de la vie privée : tout reste dans votre navigateur. Léger, écrit en Rust et WebAssembly."
+            ],
             "codeRepository": "https://github.com/DOMESDAY7/pomo"
           },
           {
@@ -53,18 +62,18 @@
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "Qu'est-ce que la technique Pomodoro ?",
+                "name": "Comment recevoir une notification Discord à la fin d'un pomodoro ?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Une méthode de gestion du temps inventée par Francesco Cirillo : on travaille 25 minutes sans interruption, puis on prend une pause de 5 minutes. Après 4 pomodoros, on prend une pause longue de 15 à 30 minutes."
+                  "text": "Dans Discord, ouvrez Paramètres du salon, Intégrations, Webhooks, puis créez un webhook et copiez son URL. Dans les réglages du minuteur, ajoutez un webhook de type Discord et collez l'URL. Le bouton « Envoyer un test » vérifie que tout fonctionne."
                 }
               },
               {
                 "@type": "Question",
-                "name": "Comment recevoir une notification Discord à la fin d'un pomodoro ?",
+                "name": "Comment afficher le minuteur dans OBS ?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Dans Discord, ouvrez Paramètres du salon, Intégrations, Webhooks, puis créez un webhook et copiez son URL. Dans les réglages du minuteur, ajoutez un webhook de type Discord et collez l'URL. Le bouton Envoyer un test vérifie que tout fonctionne."
+                  "text": "Dans les réglages, section « Overlay OBS », copiez l'URL proposée et ajoutez-la comme « Source navigateur » dans OBS. Le fond est transparent et seules les durées choisies sont utilisées."
                 }
               },
               {
@@ -77,10 +86,18 @@
               },
               {
                 "@type": "Question",
-                "name": "Mes réglages et mes URL de webhook sont-ils envoyés à un serveur ?",
+                "name": "Mes réglages, tâches et statistiques sont-ils envoyés à un serveur ?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Non. Tout est stocké dans votre navigateur. Il n'y a ni compte, ni pistage, ni publicité. Les messages partent directement de votre navigateur vers le service choisi."
+                  "text": "Non. Tout est stocké dans votre navigateur. Il n'y a ni compte, ni publicité. Les messages partent directement de votre navigateur vers le service choisi."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Le minuteur continue-t-il si je change d'onglet ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Oui. Le temps est calculé à partir de l'heure de fin prévue, il reste donc exact même quand l'onglet est en arrière-plan. Le temps restant s'affiche aussi dans le titre de l'onglet."
                 }
               }
             ]
@@ -91,12 +108,16 @@
     <!-- /i18n:head -->
     <link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/" />
     <link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/" />
+    <link rel="alternate" hreflang="es" href="https://pomo.domesday.fr/es/" />
+    <link rel="alternate" hreflang="de" href="https://pomo.domesday.fr/de/" />
+    <link rel="alternate" hreflang="pt" href="https://pomo.domesday.fr/pt/" />
     <link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/" />
     <meta name="theme-color" content="#ba4949" />
     <meta name="robots" content="index, follow" />
     <link rel="manifest" href="manifest.webmanifest" />
     <link rel="icon" type="image/png" href="icons/favicon.png" />
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <script data-goatcounter="https://domesday.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 
     <link data-trunk rel="css" href="style.css" />
     <link data-trunk rel="copy-file" href="manifest.webmanifest" />
@@ -105,6 +126,9 @@
     <link data-trunk rel="copy-file" href="sitemap.xml" />
     <link data-trunk rel="copy-file" href="og.png" />
     <link data-trunk rel="copy-file" href="og-en.png" />
+    <link data-trunk rel="copy-file" href="og-es.png" />
+    <link data-trunk rel="copy-file" href="og-de.png" />
+    <link data-trunk rel="copy-file" href="og-pt.png" />
     <link data-trunk rel="copy-dir" href="icons" />
     <link data-trunk rel="rust" data-wasm-opt="z" />
     <script>
@@ -123,80 +147,62 @@
 
     <article class="about">
       <h1>Minuteur Pomodoro gratuit en ligne</h1>
-      <p>
-        Un minuteur Pomodoro simple, <strong>sans pub, sans compte et open source</strong>. Réglez la durée du
-        travail et des pauses, recevez une notification du navigateur à la fin de chaque session et, si vous le
-        souhaitez, un message sur <strong>Discord, Slack, ntfy ou Gotify</strong>. Il s'installe comme une application
-        et fonctionne <strong>hors ligne</strong>.
-      </p>
+      <p>Un minuteur Pomodoro simple, <strong>sans pub, sans compte et open source</strong>. Réglez la durée du travail et des pauses, organisez vos tâches, suivez vos statistiques et recevez une notification du navigateur ou un message sur <strong>Discord, Slack, ntfy ou Gotify</strong> à la fin de chaque session. Il s'installe comme une application et fonctionne <strong>hors ligne</strong>.</p>
 
       <h2>Qu'est-ce que la technique Pomodoro ?</h2>
-      <p>
-        La technique Pomodoro est une méthode de gestion du temps inventée par Francesco Cirillo à la fin des années
-        1980. Le nom vient du minuteur de cuisine en forme de tomate qu'il utilisait. Le principe : découper le travail
-        en sessions courtes et concentrées, séparées par de vraies pauses.
-      </p>
+      <p>La technique Pomodoro est une méthode de gestion du temps inventée par Francesco Cirillo à la fin des années 1980. Le nom vient du minuteur de cuisine en forme de tomate qu'il utilisait. Le principe : découper le travail en sessions courtes et concentrées, séparées par de vraies pauses.</p>
 
       <h2>Comment utiliser ce minuteur Pomodoro</h2>
       <ol>
-        <li>Choisissez une tâche à accomplir.</li>
+        <li>Ajoutez la tâche sur laquelle vous travaillez.</li>
         <li>Lancez le minuteur : <strong>25 minutes</strong> de travail sans interruption.</li>
         <li>À la sonnerie, prenez une <strong>pause courte de 5 minutes</strong>.</li>
         <li>Recommencez. Après <strong>4 pomodoros</strong>, prenez une <strong>pause longue de 15 minutes</strong>.</li>
       </ol>
-      <p>Toutes ces durées se règlent dans le menu « Réglages ».</p>
+      <p>Toutes ces durées se règlent dans le menu « Réglages ». Appuyez sur <kbd>Espace</kbd> pour démarrer et sur <kbd>?</kbd> pour voir tous les raccourcis.</p>
 
       <h2>Fonctionnalités</h2>
       <ul>
-        <li><strong>Durées réglables</strong> : pomodoro, pause courte, pause longue et fréquence des pauses longues.</li>
-        <li>
-          <strong>Liste de tâches</strong> : pomodoros estimés et réalisés par tâche, heure de fin prévue, modèles
-          réutilisables et <strong>import depuis Todoist</strong>. Tout est gratuit.
-        </li>
-        <li><strong>Démarrage automatique</strong> des pauses et des pomodoros, au choix.</li>
-        <li><strong>Notifications du navigateur</strong> et signal sonore à la fin de chaque session.</li>
-        <li>
-          <strong>Webhooks</strong> : Discord, Slack, Mattermost, ntfy, Gotify ou n'importe quel service avec un corps
-          de requête personnalisé. Plusieurs webhooks en même temps.
-        </li>
-        <li><strong>Hors ligne</strong> : installable comme une application (PWA), utilisable sans connexion.</li>
-        <li><strong>Respect de la vie privée</strong> : réglages stockés dans votre navigateur uniquement.</li>
-        <li><strong>Léger et rapide</strong> : écrit en Rust et compilé en WebAssembly.</li>
+        <li><strong>Liste de tâches</strong> : pomodoros estimés et réalisés, heure de fin prévue, notes, modèles réutilisables et <strong>import depuis Todoist</strong>.</li>
+        <li><strong>Mini-minuteur flottant</strong> : une petite fenêtre qui reste au-dessus de vos autres applications (Chrome, Edge).</li>
+        <li><strong>Overlay OBS</strong> pour les streams « study with me » : fond transparent, minuteur seul, durées dans l'URL.</li>
+        <li><strong>Statistiques</strong> : pomodoros du jour et des 7 derniers jours, série de jours, tâches les plus travaillées, export CSV.</li>
+        <li><strong>Sons</strong> : quatre sonneries, tic-tac, bruit blanc, rose ou brun pour se concentrer.</li>
+        <li><strong>Notifications du navigateur</strong> et <strong>webhooks</strong> Discord, Slack, Mattermost, ntfy, Gotify ou personnalisés.</li>
+        <li><strong>Raccourcis clavier</strong>, <strong>mode sombre</strong>, durées et démarrage automatique réglables.</li>
+        <li><strong>Hors ligne</strong> : installable comme une application (PWA).</li>
+        <li><strong>Respect de la vie privée</strong> : tout reste dans votre navigateur. Léger, écrit en Rust et WebAssembly.</li>
       </ul>
 
       <h2>Questions fréquentes</h2>
       <details>
-        <summary>Comment recevoir une notification Discord à la fin d'un pomodoro ?</summary>
-        <p>
-          Dans Discord, ouvrez Paramètres du salon, Intégrations, Webhooks, puis créez un webhook et copiez son URL.
-          Dans les réglages du minuteur, ajoutez un webhook de type Discord et collez l'URL. Le bouton « Envoyer un
-          test » vérifie que tout fonctionne.
-        </p>
+        <summary>Comment recevoir une notification Discord à la fin d&#x27;un pomodoro ?</summary>
+        <p>Dans Discord, ouvrez Paramètres du salon, Intégrations, Webhooks, puis créez un webhook et copiez son URL. Dans les réglages du minuteur, ajoutez un webhook de type Discord et collez l&#x27;URL. Le bouton « Envoyer un test » vérifie que tout fonctionne.</p>
+      </details>
+      <details>
+        <summary>Comment afficher le minuteur dans OBS ?</summary>
+        <p>Dans les réglages, section « Overlay OBS », copiez l&#x27;URL proposée et ajoutez-la comme « Source navigateur » dans OBS. Le fond est transparent et seules les durées choisies sont utilisées.</p>
       </details>
       <details>
         <summary>Le minuteur fonctionne-t-il hors ligne ?</summary>
-        <p>
-          Oui. Le site s'installe comme une application (PWA) et reste utilisable sans connexion. Hors ligne, les
-          webhooks sont ignorés et seule la notification du navigateur est affichée.
-        </p>
+        <p>Oui. Le site s&#x27;installe comme une application (PWA) et reste utilisable sans connexion. Hors ligne, les webhooks sont ignorés et seule la notification du navigateur est affichée.</p>
       </details>
       <details>
-        <summary>Mes réglages et mes URL de webhook sont-ils envoyés à un serveur ?</summary>
-        <p>
-          Non. Tout est stocké dans votre navigateur. Il n'y a ni compte, ni pistage, ni publicité. Les messages
-          partent directement de votre navigateur vers le service choisi.
-        </p>
+        <summary>Mes réglages, tâches et statistiques sont-ils envoyés à un serveur ?</summary>
+        <p>Non. Tout est stocké dans votre navigateur. Il n&#x27;y a ni compte, ni publicité. Les messages partent directement de votre navigateur vers le service choisi.</p>
       </details>
       <details>
-        <summary>Le minuteur continue-t-il si je change d'onglet ?</summary>
-        <p>
-          Oui. Le temps est calculé à partir de l'heure de fin prévue, il reste donc exact même quand l'onglet est en
-          arrière-plan. Le temps restant s'affiche aussi dans le titre de l'onglet.
-        </p>
+        <summary>Le minuteur continue-t-il si je change d&#x27;onglet ?</summary>
+        <p>Oui. Le temps est calculé à partir de l&#x27;heure de fin prévue, il reste donc exact même quand l&#x27;onglet est en arrière-plan. Le temps restant s&#x27;affiche aussi dans le titre de l&#x27;onglet.</p>
       </details>
 
       <footer>
-        <a href="en/" hreflang="en" lang="en">English version</a> ·
+        <nav class="lang-links">
+        <a href="en/" hreflang="en" lang="en">English</a> ·
+        <a href="es/" hreflang="es" lang="es">Español</a> ·
+        <a href="de/" hreflang="de" lang="de">Deutsch</a> ·
+        <a href="pt/" hreflang="pt" lang="pt">Português</a>
+        </nav>
         <a href="https://github.com/DOMESDAY7/pomo">Code source sur GitHub</a>
       </footer>
     </article>

@@ -1,10 +1,14 @@
+mod audio;
 mod i18n;
 mod notify;
+mod pip;
+mod stats;
 mod tasks;
 mod webhook;
 
+use audio::{Alarm, Noise};
+use i18n::{tr, Lang};
 use leptos::prelude::*;
-use i18n::tr;
 use leptos::task::spawn_local;
 use notify::Permission;
 use serde::{Deserialize, Serialize};
@@ -39,6 +43,34 @@ impl Mode {
     }
 }
 
+#[derive(Clone, Copy, PartialEq, Eq, Debug, Default, Serialize, Deserialize)]
+enum Theme {
+    #[default]
+    Auto,
+    Light,
+    Dark,
+}
+
+impl Theme {
+    const ALL: [Theme; 3] = [Theme::Auto, Theme::Light, Theme::Dark];
+
+    fn id(self) -> &'static str {
+        match self {
+            Theme::Auto => "auto",
+            Theme::Light => "light",
+            Theme::Dark => "dark",
+        }
+    }
+
+    fn label(self) -> &'static str {
+        match self {
+            Theme::Auto => tr().theme_auto,
+            Theme::Light => tr().theme_light,
+            Theme::Dark => tr().theme_dark,
+        }
+    }
+}
+
 #[derive(Clone, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 struct Settings {
@@ -48,7 +80,12 @@ struct Settings {
     long_interval: u32,
     auto_start_breaks: bool,
     auto_start_pomodoros: bool,
-    sound: bool,
+    alarm: Alarm,
+    volume: u32,
+    tick: bool,
+    noise: Noise,
+    noise_volume: u32,
+    theme: Theme,
     browser_notify: bool,
     webhooks: Vec<Webhook>,
     notify_pomodoro_end: bool,
@@ -59,6 +96,9 @@ struct Settings {
     /// Pre-multi-webhook setting, migrated to a Discord entry on load.
     #[serde(skip_serializing)]
     webhook_url: String,
+    /// Pre-alarm-choice on/off switch, migrated to `alarm` on load.
+    #[serde(skip_serializing)]
+    sound: bool,
 }
 
 impl Default for Settings {
@@ -70,7 +110,12 @@ impl Default for Settings {
             long_interval: 4,
             auto_start_breaks: false,
             auto_start_pomodoros: false,
-            sound: true,
+            alarm: Alarm::Beep,
+            volume: 70,
+            tick: false,
+            noise: Noise::None,
+            noise_volume: 40,
+            theme: Theme::Auto,
             browser_notify: true,
             webhooks: Vec::new(),
             notify_pomodoro_end: true,
@@ -78,6 +123,7 @@ impl Default for Settings {
             msg_pomodoro_end: String::new(),
             msg_break_end: String::new(),
             webhook_url: String::new(),
+            sound: true,
         }
     }
 }
@@ -103,6 +149,10 @@ impl Settings {
         let legacy = std::mem::take(&mut s.webhook_url);
         if !legacy.trim().is_empty() && s.webhooks.is_empty() {
             s.webhooks.push(Webhook { id: 1, url: legacy, ..Webhook::default() });
+        }
+        if !s.sound {
+            s.alarm = Alarm::None;
+            s.sound = true;
         }
         for msg in [&mut s.msg_pomodoro_end, &mut s.msg_break_end] {
             if i18n::is_legacy_default(msg) {
@@ -148,6 +198,39 @@ fn format_time(ms: f64) -> String {
     format!("{:02}:{:02}", total / 60, total % 60)
 }
 
+/// `?overlay=1` turns the page into a transparent timer for OBS browser
+/// sources. Its settings come from the URL and are never saved, so an
+/// overlay can't overwrite the real app's settings in the same browser.
+#[derive(Clone)]
+struct OverlayConfig {
+    settings: Settings,
+    autostart: bool,
+    label: String,
+}
+
+fn overlay_config() -> Option<OverlayConfig> {
+    let search = window().location().search().ok()?;
+    let params = web_sys::UrlSearchParams::new_with_str(&search).ok()?;
+    if params.get("overlay").as_deref() != Some("1") {
+        return None;
+    }
+    let num = |k: &str, d: u32| params.get(k).and_then(|v| v.parse::<u32>().ok()).map_or(d, |v| v.clamp(1, 999));
+    let flag = |k: &str| params.get(k).as_deref() == Some("1");
+    let autostart = flag("autostart");
+    let settings = Settings {
+        pomodoro_min: num("pomo", 25),
+        short_min: num("short", 5),
+        long_min: num("long", 15),
+        long_interval: num("interval", 4),
+        auto_start_breaks: autostart,
+        auto_start_pomodoros: autostart,
+        alarm: if flag("sound") { Alarm::Beep } else { Alarm::None },
+        browser_notify: false,
+        ..Settings::default()
+    };
+    Some(OverlayConfig { settings, autostart, label: params.get("label").unwrap_or_default() })
+}
+
 /// Shared timer state. Every field is a Copy handle, so the struct is Copy too.
 #[derive(Clone, Copy)]
 struct Timer {
@@ -156,14 +239,16 @@ struct Timer {
     running: RwSignal<bool>,
     remaining_ms: RwSignal<f64>,
     end_at: StoredValue<f64>,
+    last_tick_sec: StoredValue<u64>,
     completed: RwSignal<u32>,
     webhook_status: RwSignal<String>,
     tasks: RwSignal<tasks::TaskState>,
+    /// False for the OBS overlay: no saving, history or webhooks.
+    persist: bool,
 }
 
 impl Timer {
-    fn new() -> Self {
-        let settings = Settings::load();
+    fn new(settings: Settings, persist: bool) -> Self {
         let remaining = settings.duration_ms(Mode::Pomodoro);
         Self {
             settings: RwSignal::new(settings),
@@ -171,9 +256,11 @@ impl Timer {
             running: RwSignal::new(false),
             remaining_ms: RwSignal::new(remaining),
             end_at: StoredValue::new(0.0),
+            last_tick_sec: StoredValue::new(0),
             completed: RwSignal::new(0),
             webhook_status: RwSignal::new(String::new()),
-            tasks: RwSignal::new(tasks::TaskState::load()),
+            tasks: RwSignal::new(if persist { tasks::TaskState::load() } else { tasks::TaskState::default() }),
+            persist,
         }
     }
 
@@ -188,6 +275,7 @@ impl Timer {
     }
 
     fn toggle(self) {
+        audio::unlock();
         if self.running.get_untracked() {
             self.pause()
         } else {
@@ -209,8 +297,17 @@ impl Timer {
         let left = self.end_at.get_value() - now();
         if left <= 0.0 {
             self.finish(true);
-        } else {
-            self.remaining_ms.set(left);
+            return;
+        }
+        self.remaining_ms.set(left);
+
+        let sec = (left / 1000.0).ceil() as u64;
+        if sec != self.last_tick_sec.get_value() {
+            self.last_tick_sec.set_value(sec);
+            let (tick, volume) = self.settings.with_untracked(|s| (s.tick, s.volume));
+            if tick && self.mode.get_untracked() == Mode::Pomodoro {
+                audio::tick(sec % 2 == 0, volume);
+            }
         }
     }
 
@@ -238,11 +335,12 @@ impl Timer {
         let s = self.settings.get_untracked();
 
         if natural {
+            audio::play_alarm(s.alarm, s.volume);
+        }
+        if natural && self.persist {
             if finished == Mode::Pomodoro {
+                stats::record(s.pomodoro_min, self.active_task_title());
                 self.tasks.update(|t| t.on_pomodoro_done());
-            }
-            if s.sound {
-                beep();
             }
             let webhooks_wanted = match finished {
                 Mode::Pomodoro => s.notify_pomodoro_end,
@@ -340,46 +438,150 @@ impl Timer {
     }
 }
 
-fn beep() {
-    let Ok(ctx) = web_sys::AudioContext::new() else { return };
-    let t0 = ctx.current_time();
-    for i in 0..3 {
-        let t = t0 + i as f64 * 0.3;
-        let (Ok(osc), Ok(gain)) = (ctx.create_oscillator(), ctx.create_gain()) else { return };
-        osc.frequency().set_value(880.0);
-        let _ = gain.gain().set_value_at_time(0.2, t);
-        let _ = gain.gain().exponential_ramp_to_value_at_time(0.001, t + 0.2);
-        let _ = osc.connect_with_audio_node(&gain);
-        let _ = gain.connect_with_audio_node(&ctx.destination());
-        let _ = osc.start_with_when(t);
-        let _ = osc.stop_with_when(t + 0.2);
-    }
-}
-
-#[component]
-fn App() -> impl IntoView {
-    let timer = Timer::new();
-    let show_settings = RwSignal::new(false);
-    let online = RwSignal::new(notify::is_online());
-
+/// Run the timer loop for the lifetime of the component.
+fn run_ticker(timer: Timer) {
     let interval = set_interval_with_handle(move || timer.tick(), Duration::from_millis(250)).ok();
     on_cleanup(move || {
         if let Some(h) = interval {
             h.clear();
         }
     });
+}
+
+/// True when a key press is meant for a form field, not for a shortcut.
+fn typing_in_field(ev: &web_sys::KeyboardEvent) -> bool {
+    ev.target()
+        .and_then(|t| t.dyn_into::<web_sys::Element>().ok())
+        .is_some_and(|el| {
+            matches!(el.tag_name().as_str(), "INPUT" | "TEXTAREA" | "SELECT")
+                || el.get_attribute("contenteditable").is_some()
+        })
+}
+
+#[component]
+fn OverlayApp(cfg: OverlayConfig) -> impl IntoView {
+    let timer = Timer::new(cfg.settings, false);
+    run_ticker(timer);
+    if cfg.autostart {
+        timer.start();
+    }
+    let _ = window_event_listener(leptos::ev::keydown, move |ev| {
+        if ev.key() == " " {
+            ev.prevent_default();
+            timer.toggle();
+        }
+    });
+    let label = cfg.label;
+
+    view! {
+        <div class=move || format!("obs {}", timer.mode.get().class()) on:click=move |_| timer.toggle()>
+            <div class="obs-session">{move || timer.mode.get().label()}</div>
+            <div class="obs-time">{move || format_time(timer.remaining_ms.get())}</div>
+            {(!label.is_empty()).then(|| view! { <div class="obs-label">{label.clone()}</div> })}
+        </div>
+    }
+}
+
+#[component]
+fn App() -> impl IntoView {
+    let timer = Timer::new(Settings::load(), true);
+    let show_settings = RwSignal::new(false);
+    let show_stats = RwSignal::new(false);
+    let show_help = RwSignal::new(false);
+    let task_editing: tasks::Editing = RwSignal::new(None);
+    let online = RwSignal::new(notify::is_online());
+    let pip_ok = pip::supported();
+
+    run_ticker(timer);
     let _ = window_event_listener(leptos::ev::online, move |_| online.set(true));
     let _ = window_event_listener(leptos::ev::offline, move |_| online.set(false));
 
-    // Persist settings, and apply new durations right away if the timer is idle.
+    let _ = window_event_listener(leptos::ev::keydown, move |ev| {
+        if ev.key() == "Escape" {
+            show_settings.set(false);
+            show_stats.set(false);
+            show_help.set(false);
+            task_editing.set(None);
+            return;
+        }
+        if ev.ctrl_key() || ev.meta_key() || ev.alt_key() || typing_in_field(&ev) {
+            return;
+        }
+        let handled = match ev.key().as_str() {
+            " " => {
+                timer.toggle();
+                true
+            }
+            "s" | "S" if timer.running.get_untracked() => {
+                timer.finish(false);
+                true
+            }
+            "1" => {
+                timer.set_mode(Mode::Pomodoro);
+                true
+            }
+            "2" => {
+                timer.set_mode(Mode::Short);
+                true
+            }
+            "3" => {
+                timer.set_mode(Mode::Long);
+                true
+            }
+            "n" | "N" => {
+                timer.tasks.update(|t| t.hidden = false);
+                task_editing.set(Some(None));
+                true
+            }
+            "p" | "P" if pip_ok => {
+                pip::open(timer);
+                true
+            }
+            "r" | "R" => {
+                show_stats.set(true);
+                true
+            }
+            "o" | "O" => {
+                show_settings.set(true);
+                true
+            }
+            "?" => {
+                show_help.set(true);
+                true
+            }
+            _ => false,
+        };
+        if handled {
+            ev.prevent_default();
+        }
+    });
+
     Effect::new(move |_| timer.tasks.with(|t| t.save()));
 
+    // Persist settings, and apply new durations right away if the timer is idle.
     Effect::new(move |_| {
         let s = timer.settings.get();
         s.save();
         if !timer.running.get_untracked() {
             timer.remaining_ms.set(s.duration_ms(timer.mode.get_untracked()));
         }
+    });
+
+    Effect::new(move |_| {
+        let theme = timer.settings.with(|s| s.theme);
+        if let Some(root) = document().document_element() {
+            let _ = match theme {
+                Theme::Auto => root.remove_attribute("data-theme"),
+                t => root.set_attribute("data-theme", t.id()),
+            };
+        }
+    });
+
+    // Background noise only plays while a pomodoro is running.
+    Effect::new(move |_| {
+        let (noise, volume) = timer.settings.with(|s| (s.noise, s.noise_volume));
+        let playing = timer.running.get() && timer.mode.get() == Mode::Pomodoro;
+        audio::set_noise(if playing { noise } else { Noise::None }, volume);
     });
 
     // Show the countdown in the tab title while running; keep the SEO title
@@ -411,12 +613,28 @@ fn App() -> impl IntoView {
             <header>
                 <div class="brand"><img class="logo" src="icons/icon-192.png" alt="" />"Pomodoro"</div>
                 <div class="header-actions">
-                    <a class="icon-btn" href=tr().switch_href title=tr().switch_title hreflang=match i18n::lang() {
-                        i18n::Lang::Fr => "en",
-                        i18n::Lang::En => "fr",
-                    }>
-                        {tr().switch_label}
-                    </a>
+                    <select
+                        class="icon-btn lang-select"
+                        aria-label=tr().language
+                        on:change=move |ev| {
+                            let code = event_target_value(&ev);
+                            if let Some(l) = Lang::ALL.into_iter().find(|l| l.code() == code) {
+                                let _ = window().location().set_href(l.href());
+                            }
+                        }
+                    >
+                        {Lang::ALL.into_iter().map(|l| view! {
+                            <option value=l.code() selected=l == i18n::lang()>{l.native_name()}</option>
+                        }).collect_view()}
+                    </select>
+                    <button class="icon-btn" aria-label=tr().stats title=format!("{} (R)", tr().stats) on:click=move |_| show_stats.set(true)>
+                        "📊"
+                    </button>
+                    {pip_ok.then(|| view! {
+                        <button class="icon-btn" aria-label=tr().mini_timer title=tr().mini_timer_title on:click=move |_| pip::open(timer)>
+                            "⧉"
+                        </button>
+                    })}
                     <button class="icon-btn" on:click=move |_| show_settings.update(|v| *v = !*v)>
                         {tr().settings}
                     </button>
@@ -444,7 +662,7 @@ fn App() -> impl IntoView {
                         {move || if timer.running.get() { "PAUSE" } else { "START" }}
                     </button>
                     <Show when=move || timer.running.get()>
-                        <button class="skip" title=tr().skip on:click=move |_| timer.finish(false)>
+                        <button class="skip" title=tr().skip aria-label=tr().skip on:click=move |_| timer.finish(false)>
                             "⏭"
                         </button>
                     </Show>
@@ -457,12 +675,63 @@ fn App() -> impl IntoView {
                 {move || tasks::focus_label(timer)}
             </p>
 
-            <tasks::TaskSection timer=timer />
+            <tasks::TaskSection timer=timer editing=task_editing />
 
             <Show when=move || show_settings.get()>
                 <SettingsPanel timer=timer on_close=move || show_settings.set(false) />
             </Show>
+            <Show when=move || show_stats.get()>
+                <stats::StatsDialog on_close=move || show_stats.set(false) />
+            </Show>
+            <Show when=move || show_help.get()>
+                <ShortcutsDialog pip_ok=pip_ok on_close=move || show_help.set(false) />
+            </Show>
         </div>
+    }
+}
+
+#[component]
+fn ShortcutsDialog(pip_ok: bool, on_close: impl Fn() + Copy + Send + Sync + 'static) -> impl IntoView {
+    let mut rows = vec![
+        (tr().key_space, tr().sc_start),
+        ("S", tr().sc_skip),
+        ("1 / 2 / 3", tr().sc_modes),
+        ("N", tr().sc_new_task),
+    ];
+    if pip_ok {
+        rows.push(("P", tr().sc_mini));
+    }
+    rows.extend([("R", tr().sc_stats), ("O", tr().sc_settings), ("?", tr().sc_help), ("Esc", tr().sc_close)]);
+
+    view! {
+        <div class="overlay" on:click=move |_| on_close()>
+            <section class="panel" role="dialog" aria-label=tr().shortcuts on:click=|ev| ev.stop_propagation()>
+                <div class="panel-head">
+                    <h2>{tr().shortcuts}</h2>
+                    <button class="close" aria-label=tr().close on:click=move |_| on_close()>"✕"</button>
+                </div>
+                <dl class="shortcuts">
+                    {rows.into_iter().map(|(k, d)| view! { <dt><kbd>{k}</kbd></dt><dd>{d}</dd> }).collect_view()}
+                </dl>
+            </section>
+        </div>
+    }
+}
+
+/// Root URL of the current page (language kept), for the OBS overlay link.
+fn page_url() -> String {
+    let loc = window().location();
+    format!("{}{}", loc.origin().unwrap_or_default(), loc.pathname().unwrap_or_default())
+}
+
+fn copy_to_clipboard(text: &str) {
+    let nav = window().navigator();
+    if let Ok(clip) = js_sys::Reflect::get(&nav, &"clipboard".into()) {
+        if let Ok(write) = js_sys::Reflect::get(&clip, &"writeText".into()) {
+            if let Ok(f) = write.dyn_into::<js_sys::Function>() {
+                let _ = f.call1(&clip, &text.into());
+            }
+        }
     }
 }
 
@@ -470,6 +739,10 @@ fn App() -> impl IntoView {
 fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'static) -> impl IntoView {
     let s = timer.settings;
     let perm = RwSignal::new(notify::permission());
+    let obs_autostart = RwSignal::new(true);
+    let obs_sound = RwSignal::new(false);
+    let obs_label = RwSignal::new(String::new());
+    let copied = RwSignal::new(false);
 
     let num = move |label: &'static str, get: fn(&Settings) -> u32, set: fn(&mut Settings, u32)| {
         view! {
@@ -503,6 +776,26 @@ fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'stati
         }
     };
 
+    let range = move |label: &'static str, get: fn(&Settings) -> u32, set: fn(&mut Settings, u32)| {
+        view! {
+            <label class="field range">
+                <span>{label}<output>{move || format!("{} %", s.with(|s| get(s)))}</output></span>
+                <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    step="5"
+                    prop:value=move || s.with(|s| get(s)).to_string()
+                    on:input=move |ev| {
+                        if let Ok(v) = event_target_value(&ev).parse::<u32>() {
+                            s.update(|s| set(s, v.min(100)));
+                        }
+                    }
+                />
+            </label>
+        }
+    };
+
     let text = move |label: &'static str, placeholder: &'static str, get: fn(&Settings) -> String, set: fn(&mut Settings, String)| {
         view! {
             <label class="field wide">
@@ -517,6 +810,43 @@ fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'stati
         }
     };
 
+    let alarm_label = |a: Alarm| match a {
+        Alarm::None => tr().alarm_none,
+        Alarm::Beep => tr().alarm_beep,
+        Alarm::Bell => tr().alarm_bell,
+        Alarm::Digital => tr().alarm_digital,
+        Alarm::Soft => tr().alarm_soft,
+    };
+    let noise_label = |n: Noise| match n {
+        Noise::None => tr().noise_none,
+        Noise::White => tr().noise_white,
+        Noise::Pink => tr().noise_pink,
+        Noise::Brown => tr().noise_brown,
+    };
+
+    let obs_url = move || {
+        let st = s.get();
+        let mut url = format!(
+            "{}?overlay=1&pomo={}&short={}&long={}&interval={}",
+            page_url(),
+            st.pomodoro_min,
+            st.short_min,
+            st.long_min,
+            st.long_interval
+        );
+        if obs_autostart.get() {
+            url += "&autostart=1";
+        }
+        if obs_sound.get() {
+            url += "&sound=1";
+        }
+        let label = obs_label.get();
+        if !label.trim().is_empty() {
+            url += &format!("&label={}", String::from(js_sys::encode_uri_component(label.trim())));
+        }
+        url
+    };
+
     let add_webhook = move |_| {
         s.update(|s| {
             let id = s.webhooks.iter().map(|w| w.id).max().unwrap_or(0) + 1;
@@ -526,10 +856,10 @@ fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'stati
 
     view! {
         <div class="overlay" on:click=move |_| on_close()>
-            <section class="panel" on:click=|ev| ev.stop_propagation()>
+            <section class="panel" role="dialog" aria-label=tr().settings.trim_start_matches("⚙ ") on:click=|ev| ev.stop_propagation()>
                 <div class="panel-head">
                     <h2>{tr().settings.trim_start_matches("⚙ ")}</h2>
-                    <button class="close" on:click=move |_| on_close()>"✕"</button>
+                    <button class="close" aria-label=tr().close on:click=move |_| on_close()>"✕"</button>
                 </div>
 
                 <h3>{tr().durations}</h3>
@@ -541,7 +871,56 @@ fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'stati
                 {num(tr().long_interval, |s| s.long_interval, |s, v| s.long_interval = v)}
                 {check(tr().auto_breaks, |s| s.auto_start_breaks, |s, v| s.auto_start_breaks = v)}
                 {check(tr().auto_pomodoros, |s| s.auto_start_pomodoros, |s, v| s.auto_start_pomodoros = v)}
-                {check(tr().sound, |s| s.sound, |s, v| s.sound = v)}
+
+                <h3>{tr().sound_section}</h3>
+                <div class="row">
+                    <label class="field grow">
+                        <span>{tr().alarm_sound}</span>
+                        <select
+                            prop:value=move || s.with(|s| s.alarm.id())
+                            on:change=move |ev| s.update(|s| s.alarm = Alarm::from_id(&event_target_value(&ev)))
+                        >
+                            {Alarm::ALL.into_iter().map(|a| view! { <option value=a.id()>{alarm_label(a)}</option> }).collect_view()}
+                        </select>
+                    </label>
+                    <button
+                        class="add"
+                        disabled=move || s.with(|s| s.alarm == Alarm::None)
+                        on:click=move |_| s.with_untracked(|s| audio::play_alarm(s.alarm, s.volume))
+                    >
+                        {tr().listen}
+                    </button>
+                </div>
+                {range(tr().volume, |s| s.volume, |s, v| s.volume = v)}
+                {check(tr().tick, |s| s.tick, |s, v| s.tick = v)}
+                <label class="field wide">
+                    <span>{tr().noise}</span>
+                    <select
+                        prop:value=move || s.with(|s| s.noise.id())
+                        on:change=move |ev| {
+                            audio::unlock();
+                            s.update(|s| s.noise = Noise::from_id(&event_target_value(&ev)))
+                        }
+                    >
+                        {Noise::ALL.into_iter().map(|n| view! { <option value=n.id()>{noise_label(n)}</option> }).collect_view()}
+                    </select>
+                </label>
+                {range(tr().noise_volume, |s| s.noise_volume, |s, v| s.noise_volume = v)}
+
+                <h3>{tr().appearance}</h3>
+                <label class="field wide">
+                    <span>{tr().theme}</span>
+                    <select
+                        prop:value=move || s.with(|s| s.theme.id())
+                        on:change=move |ev| {
+                            let id = event_target_value(&ev);
+                            s.update(|s| s.theme = Theme::ALL.into_iter().find(|t| t.id() == id).unwrap_or_default())
+                        }
+                    >
+                        {Theme::ALL.into_iter().map(|t| view! { <option value=t.id()>{t.label()}</option> }).collect_view()}
+                    </select>
+                </label>
+                <p class="hint">{tr().shortcuts_hint}</p>
 
                 <h3>{tr().browser_notifications}</h3>
                 <label class="toggle">
@@ -599,6 +978,39 @@ fn SettingsPanel(timer: Timer, on_close: impl Fn() + Copy + Send + Sync + 'stati
                 </div>
                 <p class="status">{move || timer.webhook_status.get()}</p>
 
+                <h3>{tr().obs_section}</h3>
+                <label class="toggle">
+                    <span>{tr().obs_autostart}</span>
+                    <input type="checkbox" prop:checked=move || obs_autostart.get() on:change=move |ev| obs_autostart.set(event_target_checked(&ev)) />
+                </label>
+                <label class="toggle">
+                    <span>{tr().obs_sound}</span>
+                    <input type="checkbox" prop:checked=move || obs_sound.get() on:change=move |ev| obs_sound.set(event_target_checked(&ev)) />
+                </label>
+                <label class="field wide">
+                    <span>{tr().obs_label}</span>
+                    <input
+                        type="text"
+                        placeholder=tr().obs_label_placeholder
+                        prop:value=move || obs_label.get()
+                        on:input=move |ev| obs_label.set(event_target_value(&ev))
+                    />
+                </label>
+                <div class="row">
+                    <input class="text-input mono" type="text" readonly aria-label=tr().obs_section prop:value=obs_url />
+                    <button
+                        class="test"
+                        on:click=move |_| {
+                            copy_to_clipboard(&obs_url());
+                            copied.set(true);
+                            set_timeout(move || copied.set(false), Duration::from_secs(2));
+                        }
+                    >
+                        {move || if copied.get() { tr().copied } else { tr().copy }}
+                    </button>
+                </div>
+                <p class="hint">{tr().obs_hint}</p>
+
                 <div class="row end">
                     <button class="reset" on:click=move |_| s.update(|s| {
                         *s = Settings { webhooks: std::mem::take(&mut s.webhooks), ..Settings::default() }
@@ -628,6 +1040,7 @@ fn WebhookEditor(timer: Timer, id: u32) -> impl IntoView {
         <div class="hook">
             <div class="hook-head">
                 <select
+                    aria-label=tr().webhooks
                     prop:value=move || kind().id()
                     on:change=move |ev| set(|w, v| w.kind = Kind::from_id(&v), event_target_value(&ev))
                 >
@@ -644,13 +1057,14 @@ fn WebhookEditor(timer: Timer, id: u32) -> impl IntoView {
                     />
                     {tr().enabled}
                 </label>
-                <button class="close" title=tr().delete on:click=move |_| s.update(|s| s.webhooks.retain(|w| w.id != id))>
+                <button class="close" title=tr().delete aria-label=tr().delete on:click=move |_| s.update(|s| s.webhooks.retain(|w| w.id != id))>
                     "🗑"
                 </button>
             </div>
             <input
                 class="hook-url"
                 type="password"
+                aria-label="URL"
                 placeholder=move || kind().placeholder()
                 prop:value=move || get(|w| w.url.clone())
                 on:change=move |ev| set(|w, v| w.url = v.trim().to_string(), event_target_value(&ev))
@@ -711,5 +1125,15 @@ fn main() {
         .expect("#app missing from index.html");
     // The static <noscript> fallback is only for non-JS visitors.
     root.set_inner_html("");
-    leptos::mount::mount_to(root.unchecked_into(), App).forget();
+    let root: web_sys::HtmlElement = root.unchecked_into();
+
+    match overlay_config() {
+        Some(cfg) => {
+            if let Some(html) = document().document_element() {
+                html.class_list().add_1("obs-mode").ok();
+            }
+            leptos::mount::mount_to(root, move || view! { <OverlayApp cfg=cfg.clone() /> }).forget();
+        }
+        None => leptos::mount::mount_to(root, App).forget(),
+    }
 }

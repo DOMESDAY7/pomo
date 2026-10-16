@@ -1,33 +1,27 @@
 <!-- English replacements for the marked blocks of index.html. -->
-<!-- Built into /en/index.html by scripts/build_en.py (trunk post_build hook). -->
+<!-- Built into /en/index.html by scripts/build_lang_pages.py (trunk post_build hook). -->
 
 <!-- i18n:head -->
     <title>Free Online Pomodoro Timer – Discord, Slack &amp; ntfy notifications</title>
-    <meta
-      name="description"
-      content="Free Pomodoro timer with no ads and no account. Custom durations, works offline, browser notifications and Discord, Slack, ntfy or Gotify webhooks. Open source."
-    />
+    <meta name="description" content="Free Pomodoro timer with no ads and no account: tasks, statistics, floating mini timer, OBS overlay, white noise, dark mode. Works offline, browser notifications and Discord, Slack, ntfy webhooks. Open source." />
     <link rel="canonical" href="https://pomo.domesday.fr/en/" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:locale:alternate" content="fr_FR" />
+    <meta property="og:locale:alternate" content="es_ES" />
+    <meta property="og:locale:alternate" content="de_DE" />
+    <meta property="og:locale:alternate" content="pt_BR" />
     <meta property="og:site_name" content="Pomodoro" />
     <meta property="og:url" content="https://pomo.domesday.fr/en/" />
     <meta property="og:title" content="Free Online Pomodoro Timer" />
-    <meta
-      property="og:description"
-      content="Free, no ads, works offline. Browser notifications and Discord, Slack, ntfy webhooks."
-    />
+    <meta property="og:description" content="Free, no ads, works offline. Tasks, statistics, floating mini timer, OBS overlay, Discord, Slack, ntfy webhooks." />
     <meta property="og:image" content="https://pomo.domesday.fr/og-en.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Tomato mascot and a 25:00 timer" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Free Online Pomodoro Timer" />
-    <meta
-      name="twitter:description"
-      content="Free, no ads, works offline. Browser notifications and Discord, Slack, ntfy webhooks."
-    />
+    <meta name="twitter:description" content="Free, no ads, works offline. Tasks, statistics, floating mini timer, OBS overlay, Discord, Slack, ntfy webhooks." />
     <meta name="twitter:image" content="https://pomo.domesday.fr/og-en.png" />
     <script type="application/ld+json">
       {
@@ -37,13 +31,28 @@
             "@type": "WebApplication",
             "name": "Pomodoro",
             "url": "https://pomo.domesday.fr/en/",
-            "description": "Free Pomodoro timer with browser notifications and Discord, Slack, ntfy and Gotify webhooks. Works offline.",
+            "description": "Free Pomodoro timer with a task list, statistics, floating mini timer, OBS overlay, browser notifications and Discord, Slack, ntfy and Gotify webhooks. Works offline.",
             "applicationCategory": "ProductivityApplication",
             "operatingSystem": "Any (web browser)",
             "inLanguage": "en",
             "isAccessibleForFree": true,
             "image": "https://pomo.domesday.fr/og-en.png",
-            "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "USD"
+            },
+            "featureList": [
+              "Task list: estimated and finished pomodoros, estimated finish time, notes, reusable templates and Todoist import.",
+              "Floating mini timer: a small window that stays on top of your other apps (Chrome, Edge).",
+              "OBS overlay for study-with-me streams: transparent background, timer only, durations in the URL.",
+              "Statistics: pomodoros today and over the last 7 days, streak, top tasks, CSV export.",
+              "Sounds: four alarms, ticking, white, pink or brown noise to help you focus.",
+              "Browser notifications and webhooks for Discord, Slack, Mattermost, ntfy, Gotify or any custom service.",
+              "Keyboard shortcuts, dark mode, custom durations and auto-start.",
+              "Offline: installable as an app (PWA).",
+              "Privacy: everything stays in your browser. Lightweight, written in Rust and WebAssembly."
+            ],
             "codeRepository": "https://github.com/DOMESDAY7/pomo"
           },
           {
@@ -51,18 +60,18 @@
             "mainEntity": [
               {
                 "@type": "Question",
-                "name": "What is the Pomodoro Technique?",
+                "name": "How do I get a Discord notification when a pomodoro ends?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "A time management method created by Francesco Cirillo: work for 25 minutes without interruption, then take a 5-minute break. After 4 pomodoros, take a longer 15 to 30-minute break."
+                  "text": "In Discord, open the channel settings, then Integrations, then Webhooks, create a webhook and copy its URL. In the timer settings, add a Discord webhook and paste the URL. The “Send a test” button checks that everything works."
                 }
               },
               {
                 "@type": "Question",
-                "name": "How do I get a Discord notification when a pomodoro ends?",
+                "name": "How do I show the timer in OBS?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "In Discord, open the channel settings, then Integrations, then Webhooks, create a webhook and copy its URL. In the timer settings, add a Discord webhook and paste the URL. The Send a test button checks that everything works."
+                  "text": "In the settings, under “OBS overlay”, copy the suggested URL and add it as a “Browser source” in OBS. The background is transparent and only the durations you picked are used."
                 }
               },
               {
@@ -75,10 +84,18 @@
               },
               {
                 "@type": "Question",
-                "name": "Are my settings and webhook URLs sent to a server?",
+                "name": "Are my settings, tasks and statistics sent to a server?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "No. Everything is stored in your browser. There is no account, no tracking and no ads. Messages go straight from your browser to the service you picked."
+                  "text": "No. Everything is stored in your browser. There is no account and no ads. Messages go straight from your browser to the service you picked."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Does the timer keep running if I switch tabs?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Yes. Time is computed from the planned end time, so it stays accurate even when the tab is in the background. The remaining time is also shown in the tab title."
                 }
               }
             ]
@@ -86,7 +103,7 @@
         ]
       }
     </script>
-<!-- /i18n:head -->
+    <!-- /i18n:head -->
 
 <!-- i18n:body -->
     <div id="app">
@@ -97,80 +114,63 @@
 
     <article class="about">
       <h1>Free Online Pomodoro Timer</h1>
-      <p>
-        A simple Pomodoro timer with <strong>no ads, no account, and open source</strong>. Set your work and break
-        durations, get a browser notification at the end of each session and, if you want, a message on
-        <strong>Discord, Slack, ntfy or Gotify</strong>. It installs as an app and works <strong>offline</strong>.
-      </p>
+      <p>A simple Pomodoro timer with <strong>no ads, no account, and open source</strong>. Set your work and break durations, organize your tasks, track your statistics and get a browser notification or a message on <strong>Discord, Slack, ntfy or Gotify</strong> at the end of each session. It installs as an app and works <strong>offline</strong>.</p>
 
       <h2>What is the Pomodoro Technique?</h2>
-      <p>
-        The Pomodoro Technique is a time management method created by Francesco Cirillo in the late 1980s. It is named
-        after the tomato-shaped kitchen timer he used. The idea: split your work into short, focused sessions separated
-        by real breaks.
-      </p>
+      <p>The Pomodoro Technique is a time management method created by Francesco Cirillo in the late 1980s. It is named after the tomato-shaped kitchen timer he used. The idea: split your work into short, focused sessions separated by real breaks.</p>
 
       <h2>How to use this Pomodoro timer</h2>
       <ol>
-        <li>Pick a task to work on.</li>
+        <li>Add the task you are working on.</li>
         <li>Start the timer: <strong>25 minutes</strong> of uninterrupted work.</li>
         <li>When it rings, take a <strong>5-minute short break</strong>.</li>
         <li>Repeat. After <strong>4 pomodoros</strong>, take a <strong>15-minute long break</strong>.</li>
       </ol>
-      <p>Every duration can be changed in the Settings menu.</p>
+      <p>Every duration can be changed in the Settings menu. Press <kbd>Space</kbd> to start and <kbd>?</kbd> to see all shortcuts.</p>
 
       <h2>Features</h2>
       <ul>
-        <li><strong>Custom durations</strong>: pomodoro, short break, long break and how often long breaks happen.</li>
-        <li>
-          <strong>Task list</strong>: estimated and finished pomodoros per task, estimated finish time, reusable
-          templates and <strong>Todoist import</strong>. All free.
-        </li>
-        <li><strong>Auto-start</strong> breaks and pomodoros, if you want.</li>
-        <li><strong>Browser notifications</strong> and a sound at the end of each session.</li>
-        <li>
-          <strong>Webhooks</strong>: Discord, Slack, Mattermost, ntfy, Gotify or any service with a custom request
-          body. Several webhooks at once.
-        </li>
-        <li><strong>Offline</strong>: installable as an app (PWA), usable without a connection.</li>
-        <li><strong>Privacy</strong>: settings are only stored in your browser.</li>
-        <li><strong>Light and fast</strong>: written in Rust and compiled to WebAssembly.</li>
+        <li><strong>Task list</strong>: estimated and finished pomodoros, estimated finish time, notes, reusable templates and <strong>Todoist import</strong>.</li>
+        <li><strong>Floating mini timer</strong>: a small window that stays on top of your other apps (Chrome, Edge).</li>
+        <li><strong>OBS overlay</strong> for study-with-me streams: transparent background, timer only, durations in the URL.</li>
+        <li><strong>Statistics</strong>: pomodoros today and over the last 7 days, streak, top tasks, CSV export.</li>
+        <li><strong>Sounds</strong>: four alarms, ticking, white, pink or brown noise to help you focus.</li>
+        <li><strong>Browser notifications</strong> and <strong>webhooks</strong> for Discord, Slack, Mattermost, ntfy, Gotify or any custom service.</li>
+        <li><strong>Keyboard shortcuts</strong>, <strong>dark mode</strong>, custom durations and auto-start.</li>
+        <li><strong>Offline</strong>: installable as an app (PWA).</li>
+        <li><strong>Privacy</strong>: everything stays in your browser. Lightweight, written in Rust and WebAssembly.</li>
       </ul>
 
       <h2>Frequently asked questions</h2>
       <details>
         <summary>How do I get a Discord notification when a pomodoro ends?</summary>
-        <p>
-          In Discord, open the channel settings, then Integrations, then Webhooks, create a webhook and copy its URL.
-          In the timer settings, add a Discord webhook and paste the URL. The “Send a test” button checks that
-          everything works.
-        </p>
+        <p>In Discord, open the channel settings, then Integrations, then Webhooks, create a webhook and copy its URL. In the timer settings, add a Discord webhook and paste the URL. The “Send a test” button checks that everything works.</p>
+      </details>
+      <details>
+        <summary>How do I show the timer in OBS?</summary>
+        <p>In the settings, under “OBS overlay”, copy the suggested URL and add it as a “Browser source” in OBS. The background is transparent and only the durations you picked are used.</p>
       </details>
       <details>
         <summary>Does the timer work offline?</summary>
-        <p>
-          Yes. The site installs as an app (PWA) and keeps working without a connection. When offline, webhooks are
-          skipped and only the browser notification is shown.
-        </p>
+        <p>Yes. The site installs as an app (PWA) and keeps working without a connection. When offline, webhooks are skipped and only the browser notification is shown.</p>
       </details>
       <details>
-        <summary>Are my settings and webhook URLs sent to a server?</summary>
-        <p>
-          No. Everything is stored in your browser. There is no account, no tracking and no ads. Messages go straight
-          from your browser to the service you picked.
-        </p>
+        <summary>Are my settings, tasks and statistics sent to a server?</summary>
+        <p>No. Everything is stored in your browser. There is no account and no ads. Messages go straight from your browser to the service you picked.</p>
       </details>
       <details>
         <summary>Does the timer keep running if I switch tabs?</summary>
-        <p>
-          Yes. Time is computed from the planned end time, so it stays accurate even when the tab is in the
-          background. The remaining time is also shown in the tab title.
-        </p>
+        <p>Yes. Time is computed from the planned end time, so it stays accurate even when the tab is in the background. The remaining time is also shown in the tab title.</p>
       </details>
 
       <footer>
-        <a href="./" hreflang="fr" lang="fr">Version française</a> ·
+        <nav class="lang-links">
+        <a href="./" hreflang="fr" lang="fr">Français</a> ·
+        <a href="es/" hreflang="es" lang="es">Español</a> ·
+        <a href="de/" hreflang="de" lang="de">Deutsch</a> ·
+        <a href="pt/" hreflang="pt" lang="pt">Português</a>
+        </nav>
         <a href="https://github.com/DOMESDAY7/pomo">Source code on GitHub</a>
       </footer>
     </article>
-<!-- /i18n:body -->
+    <!-- /i18n:body -->

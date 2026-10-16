@@ -1,11 +1,11 @@
 // Offline support: network-first for pages, stale-while-revalidate for assets.
 // Trunk hashes asset filenames, so each deploy fills the cache with new files
 // and old ones are dropped on activate via the version bump below.
-const CACHE = "pomo-v2";
+const CACHE = "pomo-v3";
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE).then((c) => c.addAll(["./", "./en/", "./manifest.webmanifest", "./icons/icon-192.png"]))
+    caches.open(CACHE).then((c) => c.addAll(["./", "./en/", "./es/", "./de/", "./pt/", "./manifest.webmanifest", "./icons/icon-192.png"]))
   );
   self.skipWaiting();
 });
@@ -32,9 +32,12 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE).then((c) => c.put(req, copy));
           return res;
         })
-        .catch(() =>
-          caches.match(req, { ignoreSearch: true }).then((hit) => hit || caches.match(url.pathname.includes("/en/") ? "./en/" : "./"))
-        )
+        .catch(() => {
+          const lang = url.pathname.match(/\/(en|es|de|pt)\//);
+          return caches
+            .match(req, { ignoreSearch: true })
+            .then((hit) => hit || caches.match(lang ? `./${lang[1]}/` : "./"));
+        })
     );
     return;
   }

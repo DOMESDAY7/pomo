@@ -1,0 +1,176 @@
+<!-- Español replacements for the marked blocks of index.html. -->
+<!-- Built into /es/index.html by scripts/build_lang_pages.py (trunk post_build hook). -->
+
+<!-- i18n:head -->
+    <title>Temporizador Pomodoro gratis online – avisos en Discord, Slack y ntfy</title>
+    <meta name="description" content="Temporizador Pomodoro gratis, sin anuncios y sin cuenta: tareas, estadísticas, mini temporizador flotante, overlay para OBS, ruido blanco, modo oscuro. Funciona sin conexión, con notificaciones y webhooks de Discord, Slack y ntfy. Código abierto." />
+    <link rel="canonical" href="https://pomo.domesday.fr/es/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_ES" />
+    <meta property="og:locale:alternate" content="fr_FR" />
+    <meta property="og:locale:alternate" content="en_US" />
+    <meta property="og:locale:alternate" content="de_DE" />
+    <meta property="og:locale:alternate" content="pt_BR" />
+    <meta property="og:site_name" content="Pomodoro" />
+    <meta property="og:url" content="https://pomo.domesday.fr/es/" />
+    <meta property="og:title" content="Temporizador Pomodoro gratis online" />
+    <meta property="og:description" content="Gratis, sin anuncios, sin conexión. Tareas, estadísticas, mini temporizador flotante, overlay para OBS, webhooks de Discord, Slack y ntfy." />
+    <meta property="og:image" content="https://pomo.domesday.fr/og-es.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Mascota tomate y un temporizador 25:00" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Temporizador Pomodoro gratis online" />
+    <meta name="twitter:description" content="Gratis, sin anuncios, sin conexión. Tareas, estadísticas, mini temporizador flotante, overlay para OBS, webhooks de Discord, Slack y ntfy." />
+    <meta name="twitter:image" content="https://pomo.domesday.fr/og-es.png" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "WebApplication",
+            "name": "Pomodoro",
+            "url": "https://pomo.domesday.fr/es/",
+            "description": "Temporizador Pomodoro gratis con lista de tareas, estadísticas, mini temporizador flotante, overlay para OBS, notificaciones del navegador y webhooks de Discord, Slack, ntfy y Gotify. Funciona sin conexión.",
+            "applicationCategory": "ProductivityApplication",
+            "operatingSystem": "Cualquiera (navegador web)",
+            "inLanguage": "es",
+            "isAccessibleForFree": true,
+            "image": "https://pomo.domesday.fr/og-es.png",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "EUR"
+            },
+            "featureList": [
+              "Lista de tareas: pomodoros estimados y hechos, hora de fin estimada, notas, plantillas reutilizables e importación desde Todoist.",
+              "Mini temporizador flotante: una ventana pequeña que se queda encima de tus otras aplicaciones (Chrome, Edge).",
+              "Overlay para OBS para directos «study with me»: fondo transparente, solo el temporizador, duraciones en la URL.",
+              "Estadísticas: pomodoros de hoy y de los últimos 7 días, racha, tareas más trabajadas, exportación CSV.",
+              "Sonidos: cuatro alarmas, tictac, ruido blanco, rosa o marrón para concentrarte.",
+              "Notificaciones del navegador y webhooks de Discord, Slack, Mattermost, ntfy, Gotify o personalizados.",
+              "Atajos de teclado, modo oscuro, duraciones e inicio automático ajustables.",
+              "Sin conexión: se instala como una aplicación (PWA).",
+              "Privacidad: todo se queda en tu navegador. Ligero, escrito en Rust y WebAssembly."
+            ],
+            "codeRepository": "https://github.com/DOMESDAY7/pomo"
+          },
+          {
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "¿Cómo recibo un aviso en Discord al terminar un pomodoro?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "En Discord, abre los ajustes del canal, Integraciones, Webhooks, crea un webhook y copia su URL. En los ajustes del temporizador, añade un webhook de tipo Discord y pega la URL. El botón «Enviar una prueba» comprueba que todo funciona."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Cómo muestro el temporizador en OBS?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "En los ajustes, sección «Overlay para OBS», copia la URL propuesta y añádela como «Fuente de navegador» en OBS. El fondo es transparente y se usan las duraciones que elegiste."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿El temporizador funciona sin conexión?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sí. El sitio se instala como una aplicación (PWA) y sigue funcionando sin conexión. Sin conexión, los webhooks se omiten y solo se muestra la notificación del navegador."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿Mis ajustes, tareas y estadísticas se envían a un servidor?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "No. Todo se guarda en tu navegador. No hay cuenta ni anuncios. Los mensajes van directamente de tu navegador al servicio que elegiste."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "¿El temporizador sigue si cambio de pestaña?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Sí. El tiempo se calcula a partir de la hora de fin prevista, así que sigue siendo exacto aunque la pestaña esté en segundo plano. El tiempo restante también aparece en el título de la pestaña."
+                }
+              }
+            ]
+          }
+        ]
+      }
+    </script>
+    <!-- /i18n:head -->
+
+<!-- i18n:body -->
+    <div id="app">
+      <noscript>
+        <p class="noscript">Este temporizador necesita JavaScript y WebAssembly para funcionar.</p>
+      </noscript>
+    </div>
+
+    <article class="about">
+      <h1>Temporizador Pomodoro gratis online</h1>
+      <p>Un temporizador Pomodoro sencillo, <strong>sin anuncios, sin cuenta y de código abierto</strong>. Ajusta la duración del trabajo y de los descansos, organiza tus tareas, sigue tus estadísticas y recibe una notificación del navegador o un mensaje en <strong>Discord, Slack, ntfy o Gotify</strong> al final de cada sesión. Se instala como una aplicación y funciona <strong>sin conexión</strong>.</p>
+
+      <h2>¿Qué es la técnica Pomodoro?</h2>
+      <p>La técnica Pomodoro es un método de gestión del tiempo creado por Francesco Cirillo a finales de los años 80. Su nombre viene del temporizador de cocina con forma de tomate que usaba. La idea: dividir el trabajo en sesiones cortas y concentradas, separadas por descansos de verdad.</p>
+
+      <h2>Cómo usar este temporizador Pomodoro</h2>
+      <ol>
+        <li>Añade la tarea en la que estás trabajando.</li>
+        <li>Inicia el temporizador: <strong>25 minutos</strong> de trabajo sin interrupciones.</li>
+        <li>Cuando suene, toma un <strong>descanso corto de 5 minutos</strong>.</li>
+        <li>Repite. Después de <strong>4 pomodoros</strong>, toma un <strong>descanso largo de 15 minutos</strong>.</li>
+      </ol>
+      <p>Todas las duraciones se cambian en el menú «Ajustes». Pulsa <kbd>Espacio</kbd> para empezar y <kbd>?</kbd> para ver todos los atajos.</p>
+
+      <h2>Funciones</h2>
+      <ul>
+        <li><strong>Lista de tareas</strong>: pomodoros estimados y hechos, hora de fin estimada, notas, plantillas reutilizables e <strong>importación desde Todoist</strong>.</li>
+        <li><strong>Mini temporizador flotante</strong>: una ventana pequeña que se queda encima de tus otras aplicaciones (Chrome, Edge).</li>
+        <li><strong>Overlay para OBS</strong> para directos «study with me»: fondo transparente, solo el temporizador, duraciones en la URL.</li>
+        <li><strong>Estadísticas</strong>: pomodoros de hoy y de los últimos 7 días, racha, tareas más trabajadas, exportación CSV.</li>
+        <li><strong>Sonidos</strong>: cuatro alarmas, tictac, ruido blanco, rosa o marrón para concentrarte.</li>
+        <li><strong>Notificaciones del navegador</strong> y <strong>webhooks</strong> de Discord, Slack, Mattermost, ntfy, Gotify o personalizados.</li>
+        <li><strong>Atajos de teclado</strong>, <strong>modo oscuro</strong>, duraciones e inicio automático ajustables.</li>
+        <li><strong>Sin conexión</strong>: se instala como una aplicación (PWA).</li>
+        <li><strong>Privacidad</strong>: todo se queda en tu navegador. Ligero, escrito en Rust y WebAssembly.</li>
+      </ul>
+
+      <h2>Preguntas frecuentes</h2>
+      <details>
+        <summary>¿Cómo recibo un aviso en Discord al terminar un pomodoro?</summary>
+        <p>En Discord, abre los ajustes del canal, Integraciones, Webhooks, crea un webhook y copia su URL. En los ajustes del temporizador, añade un webhook de tipo Discord y pega la URL. El botón «Enviar una prueba» comprueba que todo funciona.</p>
+      </details>
+      <details>
+        <summary>¿Cómo muestro el temporizador en OBS?</summary>
+        <p>En los ajustes, sección «Overlay para OBS», copia la URL propuesta y añádela como «Fuente de navegador» en OBS. El fondo es transparente y se usan las duraciones que elegiste.</p>
+      </details>
+      <details>
+        <summary>¿El temporizador funciona sin conexión?</summary>
+        <p>Sí. El sitio se instala como una aplicación (PWA) y sigue funcionando sin conexión. Sin conexión, los webhooks se omiten y solo se muestra la notificación del navegador.</p>
+      </details>
+      <details>
+        <summary>¿Mis ajustes, tareas y estadísticas se envían a un servidor?</summary>
+        <p>No. Todo se guarda en tu navegador. No hay cuenta ni anuncios. Los mensajes van directamente de tu navegador al servicio que elegiste.</p>
+      </details>
+      <details>
+        <summary>¿El temporizador sigue si cambio de pestaña?</summary>
+        <p>Sí. El tiempo se calcula a partir de la hora de fin prevista, así que sigue siendo exacto aunque la pestaña esté en segundo plano. El tiempo restante también aparece en el título de la pestaña.</p>
+      </details>
+
+      <footer>
+        <nav class="lang-links">
+        <a href="./" hreflang="fr" lang="fr">Français</a> ·
+        <a href="en/" hreflang="en" lang="en">English</a> ·
+        <a href="de/" hreflang="de" lang="de">Deutsch</a> ·
+        <a href="pt/" hreflang="pt" lang="pt">Português</a>
+        </nav>
+        <a href="https://github.com/DOMESDAY7/pomo">Código fuente en GitHub</a>
+      </footer>
+    </article>
+    <!-- /i18n:body -->

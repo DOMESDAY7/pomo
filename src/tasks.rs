@@ -2,7 +2,7 @@
 //! finished pomodoros, templates and a Todoist import. Everything is stored
 //! in localStorage.
 
-use crate::i18n::{lang, tr, Lang};
+use crate::i18n::{hours, tr};
 use crate::webhook::js_err;
 use crate::{now, storage, Mode, Timer};
 use leptos::prelude::*;
@@ -138,13 +138,12 @@ enum Dialog {
 }
 
 /// `None`: no editor open. `Some(None)`: adding a task. `Some(Some(id))`: editing `id`.
-type Editing = RwSignal<Option<Option<u32>>>;
+pub type Editing = RwSignal<Option<Option<u32>>>;
 
 #[component]
-pub fn TaskSection(timer: Timer) -> impl IntoView {
+pub fn TaskSection(timer: Timer, editing: Editing) -> impl IntoView {
     let st = timer.tasks;
     let menu_open = RwSignal::new(false);
-    let editing: Editing = RwSignal::new(None);
     let dialog = RwSignal::new(None::<Dialog>);
 
     let menu_action = move |f: fn(&mut TaskState)| {
@@ -426,8 +425,7 @@ fn Summary(timer: Timer) -> impl IntoView {
                 .sum();
             let minutes = remaining * s.pomodoro_min + breaks;
             let end = js_sys::Date::new(&(now() + minutes as f64 * 60_000.0).into());
-            let hours = format!("{:.1}", minutes as f64 / 60.0);
-            let hours = if lang() == Lang::Fr { format!("{} h", hours.replace('.', ",")) } else { format!("{hours}h") };
+            let hours = hours(minutes as f64 / 60.0);
             line += &format!(
                 " · {} {:02}:{:02} ({hours})",
                 tr().summary_finish,

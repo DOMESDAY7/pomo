@@ -5,6 +5,9 @@
     <lastmod>2026-10-16</lastmod>
     <xhtml:link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://pomo.domesday.fr/es/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://pomo.domesday.fr/de/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://pomo.domesday.fr/pt/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/" />
   </url>
   <url>
@@ -12,6 +15,39 @@
     <lastmod>2026-10-16</lastmod>
     <xhtml:link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/" />
     <xhtml:link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://pomo.domesday.fr/es/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://pomo.domesday.fr/de/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://pomo.domesday.fr/pt/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/" />
+  </url>
+  <url>
+    <loc>https://pomo.domesday.fr/es/</loc>
+    <lastmod>2026-10-16</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://pomo.domesday.fr/es/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://pomo.domesday.fr/de/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://pomo.domesday.fr/pt/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/" />
+  </url>
+  <url>
+    <loc>https://pomo.domesday.fr/de/</loc>
+    <lastmod>2026-10-16</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://pomo.domesday.fr/es/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://pomo.domesday.fr/de/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://pomo.domesday.fr/pt/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/" />
+  </url>
+  <url>
+    <loc>https://pomo.domesday.fr/pt/</loc>
+    <lastmod>2026-10-16</lastmod>
+    <xhtml:link rel="alternate" hreflang="fr" href="https://pomo.domesday.fr/" />
+    <xhtml:link rel="alternate" hreflang="en" href="https://pomo.domesday.fr/en/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://pomo.domesday.fr/es/" />
+    <xhtml:link rel="alternate" hreflang="de" href="https://pomo.domesday.fr/de/" />
+    <xhtml:link rel="alternate" hreflang="pt" href="https://pomo.domesday.fr/pt/" />
     <xhtml:link rel="alternate" hreflang="x-default" href="https://pomo.domesday.fr/en/" />
   </url>
 </urlset>
