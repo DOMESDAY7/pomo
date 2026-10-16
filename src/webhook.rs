@@ -122,7 +122,7 @@ pub enum Delivery {
     Sent,
 }
 
-fn js_err(e: JsValue) -> String {
+pub(crate) fn js_err(e: JsValue) -> String {
     e.as_string()
         .or_else(|| js_sys::Reflect::get(&e, &"message".into()).ok().and_then(|m| m.as_string()))
         .unwrap_or_else(|| tr().err_unknown.into())

@@ -29,6 +29,7 @@ Notifications du navigateur · Webhooks Discord, Slack, ntfy, Gotify · Fonction
 | | |
 |---|---|
 | ⏱ **Durées réglables** | Pomodoro, pause courte, pause longue et fréquence des pauses longues (25 / 5 / 15 min, une pause longue tous les 4 par défaut). |
+| ✅ **Tâches** | Pomodoros estimés / réalisés par tâche, tâche active qui compte les pomodoros terminés, heure de fin prévue, notes, modèles réutilisables, import Todoist, masquer / vider la liste. Tout est gratuit, sans compte. |
 | 🔁 **Démarrage automatique** | Enchaîne les pauses et les pomodoros sans cliquer, si tu le souhaites. |
 | 🔔 **Notifications du navigateur** | Une notification et un signal sonore à la fin de chaque session, même dans l'application installée. |
 | 🪝 **Webhooks** | Discord, Slack / Mattermost, ntfy, Gotify, ou n'importe quel service avec un corps de requête personnalisé. Plusieurs webhooks en même temps. |
@@ -65,6 +66,7 @@ Les messages sont des modèles avec des variables :
 | `{mode}` | session qui vient de se terminer |
 | `{next}` | session suivante |
 | `{min}` | durée de la session suivante, en minutes |
+| `{task}` | titre de la tâche active |
 | `{title}`, `{message}` | titre et message rendus (corps personnalisé uniquement) |
 
 Dans un corps personnalisé, les valeurs sont échappées automatiquement selon le `Content-Type` (JSON ou form-urlencoded).
@@ -93,6 +95,7 @@ trunk build --release    # build optimisé dans dist/
 src/
 ├── main.rs       # UI Leptos, état du minuteur, réglages
 ├── i18n.rs       # textes FR / EN, langue lue dans <html lang>
+├── tasks.rs      # liste de tâches, modèles, import Todoist
 ├── webhook.rs    # formats par service, envoi des requêtes
 └── notify.rs     # notifications navigateur (via le service worker si présent)
 index.html        # point d'entrée trunk + contenu statique FR, méta SEO, JSON-LD
@@ -122,3 +125,7 @@ Le build cible la racine du domaine (`--public-url /`). Pour servir le site sous
 ### Traductions
 
 Les textes de l'application sont dans `src/i18n.rs`, un `Strings` par langue : le compilateur refuse une traduction incomplète. Le contenu statique (titre, description, FAQ, JSON-LD) est dans `index.html` pour le français et dans `i18n/en.html` pour l'anglais. Une FAQ modifiée doit l'être aux deux endroits de chaque fichier : le texte visible et le JSON-LD.
+
+### Import Todoist
+
+L'import appelle directement l'API Todoist depuis le navigateur (`api/v1`, avec repli sur `rest/v2`). Il faut un jeton personnel : *Todoist → Paramètres → Intégrations → Développeur*. Le filtre par défaut est `today | overdue`, et un champ vide importe toutes les tâches. Une tâche déjà importée n'est pas ajoutée une deuxième fois.

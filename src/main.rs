@@ -1,5 +1,6 @@
 mod i18n;
 mod notify;
+mod tasks;
 mod webhook;
 
 use leptos::prelude::*;
@@ -157,6 +158,7 @@ struct Timer {
     end_at: StoredValue<f64>,
     completed: RwSignal<u32>,
     webhook_status: RwSignal<String>,
+    tasks: RwSignal<tasks::TaskState>,
 }
 
 impl Timer {
@@ -171,6 +173,7 @@ impl Timer {
             end_at: StoredValue::new(0.0),
             completed: RwSignal::new(0),
             webhook_status: RwSignal::new(String::new()),
+            tasks: RwSignal::new(tasks::TaskState::load()),
         }
     }
 
@@ -235,6 +238,9 @@ impl Timer {
         let s = self.settings.get_untracked();
 
         if natural {
+            if finished == Mode::Pomodoro {
+                self.tasks.update(|t| t.on_pomodoro_done());
+            }
             if s.sound {
                 beep();
             }
@@ -252,6 +258,7 @@ impl Timer {
                 ("mode", finished.label().to_string()),
                 ("next", next.label().to_string()),
                 ("min", s.minutes(next).to_string()),
+                ("task", self.active_task_title()),
             ];
             let msg = webhook::render(template, &vars, str::to_string);
             vars.push(("title", title.to_string()));
@@ -290,6 +297,12 @@ impl Timer {
         }
     }
 
+    fn active_task_title(self) -> String {
+        self.tasks
+            .with_untracked(|s| s.active_task().map(|t| t.title.clone()))
+            .unwrap_or_default()
+    }
+
     fn send_all(self, hooks: Vec<Webhook>, title: String, msg: String, vars: Vars) {
         self.webhook_status.set(tr().sending.into());
         spawn_local(async move {
@@ -321,6 +334,7 @@ impl Timer {
             ("mode", self.mode.get_untracked().label().to_string()),
             ("next", self.next_mode().label().to_string()),
             ("min", "0".into()),
+            ("task", self.active_task_title()),
         ];
         self.send_all(vec![hook], title, msg, vars);
     }
@@ -358,6 +372,8 @@ fn App() -> impl IntoView {
     let _ = window_event_listener(leptos::ev::offline, move |_| online.set(false));
 
     // Persist settings, and apply new durations right away if the timer is idle.
+    Effect::new(move |_| timer.tasks.with(|t| t.save()));
+
     Effect::new(move |_| {
         let s = timer.settings.get();
         s.save();
@@ -438,8 +454,10 @@ fn App() -> impl IntoView {
             <p class="count">
                 {move || format!("#{}", timer.completed.get() + 1)}
                 <br />
-                {move || if timer.mode.get() == Mode::Pomodoro { tr().focus } else { tr().on_break }}
+                {move || tasks::focus_label(timer)}
             </p>
+
+            <tasks::TaskSection timer=timer />
 
             <Show when=move || show_settings.get()>
                 <SettingsPanel timer=timer on_close=move || show_settings.set(false) />
